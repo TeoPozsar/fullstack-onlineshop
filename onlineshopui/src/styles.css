@@ -1,0 +1,153 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import 'tailwindcss';
+
+:root {
+    color-scheme: light;
+    --color-primary: #7a0f14;
+    --color-primary-foreground: #fff5f6;
+    --color-surface: #fbf8f8;
+    --color-surface-2: #f3ebec;
+    --color-border: #e2d3d4;
+    --color-text: #2a1516;
+    --color-text-muted: #6c4a4b;
+    --color-accent: #a83b3f;
+    --color-accent-foreground: #fff0f1;
+    --color-ring: #a83b3f;
+    --color-destructive: #b2342f;
+    --color-destructive-foreground: #fff5f6;
+}
+
+.theme-dark {
+    color-scheme: dark;
+    --color-primary: #a81f25;
+    --color-primary-foreground: #fff0f1;
+    --color-surface: #121212;
+    --color-surface-2: #1a1718;
+    --color-border: #302628;
+    --color-text: #efe6e6;
+    --color-text-muted: #c4b1b3;
+    --color-accent: #c43a3f;
+    --color-accent-foreground: #120f10;
+    --color-ring: #c43a3f;
+    --color-destructive: #cf4b45;
+    --color-destructive-foreground: #120f10;
+}
+
+@theme {
+    --color-primary: var(--color-primary);
+    --color-primary-foreground: var(--color-primary-foreground);
+    --color-surface: var(--color-surface);
+    --color-surface-2: var(--color-surface-2);
+    --color-border: var(--color-border);
+    --color-text: var(--color-text);
+    --color-text-muted: var(--color-text-muted);
+    --color-accent: var(--color-accent);
+    --color-accent-foreground: var(--color-accent-foreground);
+    --color-ring: var(--color-ring);
+    --color-destructive: var(--color-destructive);
+    --color-destructive-foreground: var(--color-destructive-foreground);
+    --shadow-card: 0 12px 36px -24px rgba(19, 10, 10, 0.5), 0 2px 6px -4px rgba(19, 10, 10, 0.35);
+}
+
+@layer base {
+    html,
+    body {
+        height: 100%;
+    }
+
+    body {
+        background:
+            radial-gradient(1200px 600px at 10% -10%, #f5ecec 0%, transparent 55%),
+            radial-gradient(900px 500px at 90% 0%, #efe4e5 0%, transparent 50%),
+            var(--color-surface);
+        color: var(--color-text);
+        font-family:
+            'Roboto',
+            ui-sans-serif,
+            system-ui,
+            -apple-system,
+            'Segoe UI',
+            sans-serif;
+        text-rendering: optimizeLegibility;
+        scrollbar-color: var(--color-text-muted) var(--color-surface-2);
+        scrollbar-width: thin;
+    }
+
+    button:not(:disabled) {
+        cursor: pointer;
+    }
+
+    button:disabled {
+        cursor: not-allowed;
+    }
+
+    .theme-dark body {
+        background:
+            radial-gradient(1200px 600px at 10% -10%, #1b1718 0%, transparent 55%),
+            radial-gradient(900px 500px at 90% 0%, #1f1a1b 0%, transparent 50%),
+            var(--color-surface);
+    }
+
+    .theme-dark {
+        --shadow-card:
+            0 18px 44px -28px rgba(6, 6, 6, 0.9), 0 2px 12px -6px rgba(6, 6, 6, 0.7),
+            0 0 0 1px rgba(255, 240, 241, 0.06);
+    }
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-surface-2);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-text-muted);
+    border-radius: 999px;
+    border: 2px solid var(--color-surface-2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text);
+}
+
+@layer utilities {
+    .notice-enter {
+        animation: notice-in 220ms ease-out;
+    }
+
+    .notice-enter:nth-child(1) {
+        animation-delay: 0ms;
+    }
+
+    .notice-enter:nth-child(2) {
+        animation-delay: 60ms;
+    }
+
+    .notice-enter:nth-child(3) {
+        animation-delay: 120ms;
+    }
+
+    .notice-enter:nth-child(4) {
+        animation-delay: 180ms;
+    }
+
+    .notice-enter:nth-child(5) {
+        animation-delay: 240ms;
+    }
+}
+
+@keyframes notice-in {
+    0% {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

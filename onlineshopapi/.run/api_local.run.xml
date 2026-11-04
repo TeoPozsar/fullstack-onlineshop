@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="api:local" type="Application" factoryName="Application">
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+    <option name="MAIN_CLASS_NAME" value="msg.onlineshopapi.OnlineShopApiApplication" />
+    <module name="onlineshopapi" />
+    <option name="PROGRAM_PARAMETERS" value="" />
+    <option name="VM_PARAMETERS" value="-Dspring.profiles.active=local" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="msg.onlineshopapi.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

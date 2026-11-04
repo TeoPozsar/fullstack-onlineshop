@@ -1,0 +1,40 @@
+<div class="min-h-screen bg-surface py-8">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-10">
+            <div>
+                <h1 class="text-3xl font-semibold text-text tracking-tight">Orders</h1>
+                <p class="mt-2 text-text-muted max-w-xl">Track your recent purchases.</p>
+            </div>
+        </div>
+
+        @if (loading()) {
+            <app-spinner [overlay]="true" />
+        }
+
+        @if (error() && !loading()) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                <p class="text-red-800 mb-4">{{ error() }}</p>
+                <button
+                    (click)="retry()"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                >
+                    Try Again
+                </button>
+            </div>
+        }
+
+        @if (!loading() && !error() && orderSummaries().length === 0) {
+            <div class="text-center py-16">
+                <p class="text-text-muted text-lg">No orders yet.</p>
+            </div>
+        }
+
+        @if (!loading() && !error() && orderSummaries().length > 0) {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @for (order of orderSummaries(); track order.id) {
+                    <app-order-card [order]="order" (viewDetails)="onViewDetails($event)" />
+                }
+            </div>
+        }
+    </div>
+</div>

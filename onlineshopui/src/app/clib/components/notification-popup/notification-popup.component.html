@@ -1,0 +1,38 @@
+<section
+    class="pointer-events-none fixed right-4 top-20 z-50 flex w-[22rem] max-w-[90vw] flex-col gap-3"
+>
+    @for (notice of notifications(); track notice.id) {
+        <article
+            class="pointer-events-auto grid gap-2 rounded-lg border bg-surface p-4 shadow-lg transition notice-enter"
+            [class.border-primary/30]="notice.level === 'success'"
+            [class.border-blue-200]="notice.level === 'info'"
+            [class.border-rose-200]="notice.level === 'error'"
+        >
+            <div class="flex items-start justify-between gap-3">
+                <div class="grid gap-1">
+                    <span
+                        class="text-sm font-semibold uppercase tracking-wide text-text"
+                        [class.text-primary]="notice.level === 'success'"
+                        [class.text-blue-700]="notice.level === 'info'"
+                        [class.text-rose-700]="notice.level === 'error'"
+                    >
+                        {{ notice.title }}
+                    </span>
+                    @if (notice.message) {
+                        <p class="text-sm text-text-muted">
+                            {{ notice.message }}
+                        </p>
+                    }
+                </div>
+                <button
+                    type="button"
+                    class="inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium text-text-muted transition hover:bg-surface-2 hover:text-text"
+                    (click)="dismiss(notice.id)"
+                >
+                    <span class="sr-only">Close</span>
+                    <app-icon name="x" size="xs" />
+                </button>
+            </div>
+        </article>
+    }
+</section>

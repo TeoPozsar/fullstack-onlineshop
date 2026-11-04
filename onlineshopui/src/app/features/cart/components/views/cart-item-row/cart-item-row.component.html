@@ -1,0 +1,54 @@
+<app-card [fullHeight]="true">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div class="flex items-center gap-4 flex-1">
+            <div class="w-20 h-20 bg-surface-2 rounded-lg overflow-hidden">
+                <img
+                    [src]="product().imageUrl || '/placeholder-product.svg'"
+                    [alt]="product().name"
+                    class="w-full h-full object-cover"
+                />
+            </div>
+            <div class="flex-1">
+                <div class="text-sm text-text-muted">{{ product().category.name }}</div>
+                <div class="text-lg font-semibold text-text">{{ product().name }}</div>
+                <div class="text-sm text-text-muted">${{ product().price.toFixed(2) }}</div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button
+                type="button"
+                (click)="decrement()"
+                [disabled]="isUpdating()"
+                class="w-9 h-9 flex items-center justify-center bg-surface border border-border rounded-md hover:bg-surface-2 transition-colors disabled:opacity-50"
+                aria-label="Decrease quantity"
+            >
+                <app-icon name="minus" size="xs" className="text-text-muted" />
+            </button>
+            <span class="w-10 text-center text-lg font-semibold text-text">
+                {{ cartItem().quantity }}
+            </span>
+            <button
+                type="button"
+                (click)="increment()"
+                [disabled]="isUpdating()"
+                class="w-9 h-9 flex items-center justify-center bg-surface border border-border rounded-md hover:bg-surface-2 transition-colors disabled:opacity-50"
+                aria-label="Increase quantity"
+            >
+                <app-icon name="plus" size="xs" className="text-text-muted" />
+            </button>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="text-lg font-semibold text-text">${{ lineTotal() }}</div>
+            <button
+                type="button"
+                (click)="onRemove()"
+                [disabled]="isUpdating()"
+                class="px-3 py-2 rounded-md border border-border text-text hover:bg-surface-2 transition-colors disabled:opacity-50"
+            >
+                Remove
+            </button>
+        </div>
+    </div>
+</app-card>

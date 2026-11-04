@@ -1,0 +1,132 @@
+<div class="min-h-screen bg-surface py-8">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <!-- Back Button -->
+        <button
+            (click)="goBack()"
+            class="mb-6 flex items-center gap-2 text-text-muted hover:text-text transition-colors"
+        >
+            <app-icon name="chevron-left" size="sm" />
+            Back to Products
+        </button>
+
+        <!-- Loading State -->
+        @if (loading()) {
+            <app-spinner [overlay]="true"></app-spinner>
+        }
+
+        <!-- Error State -->
+        @if (error() && !loading()) {
+            <div
+                class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center"
+            >
+                <p class="text-red-800 dark:text-red-200 mb-4">{{ error() }}</p>
+                <button
+                    (click)="retry()"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white rounded-md transition-colors"
+                >
+                    Try Again
+                </button>
+            </div>
+        }
+
+        <!-- Product Detail -->
+        @if (product() && !loading() && !error()) {
+            <app-card>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Product Image -->
+                    <div class="aspect-[4/3] bg-surface-2 rounded-lg overflow-hidden">
+                        <img
+                            [src]="getImageUrl()"
+                            [alt]="product()!.name"
+                            (error)="handleImageError($event)"
+                            class="w-full h-full object-cover"
+                        />
+                    </div>
+
+                    <!-- Product Info -->
+                    <div class="flex flex-col">
+                        <!-- Category Badge -->
+                        <div class="mb-3">
+                            <span
+                                class="inline-block px-3 py-1 text-sm font-medium rounded-md bg-primary/10 text-primary"
+                            >
+                                {{ product()!.category.name }}
+                            </span>
+                        </div>
+
+                        <!-- Product Name -->
+                        <h1 class="text-3xl font-bold text-text mb-4">
+                            {{ product()!.name }}
+                        </h1>
+
+                        <!-- Price -->
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold text-text">
+                                ${{ product()!.price.toFixed(2) }}
+                            </span>
+                            <span class="ml-3 text-lg text-text-muted">
+                                ({{ product()!.weight }}g)
+                            </span>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-6">
+                            <h2 class="text-lg font-semibold text-text mb-2">Description</h2>
+                            <p class="text-text-muted leading-relaxed">
+                                {{ product()!.description }}
+                            </p>
+                        </div>
+
+                        <!-- Quantity Selector -->
+                        <div class="mb-6">
+                            <div class="block text-sm font-medium text-text-muted mb-2">
+                                Quantity
+                            </div>
+                            <div
+                                class="flex items-center gap-3"
+                                role="group"
+                                aria-label="Quantity selector"
+                            >
+                                <button
+                                    (click)="decrementQuantity()"
+                                    class="w-10 h-10 flex items-center justify-center bg-surface border border-border rounded-md hover:bg-surface-2 transition-colors"
+                                >
+                                    <app-icon name="minus" size="sm" className="text-text-muted" />
+                                </button>
+                                <span class="w-16 text-center text-xl font-semibold text-text">
+                                    {{ quantity() }}
+                                </span>
+                                <button
+                                    (click)="incrementQuantity()"
+                                    class="w-10 h-10 flex items-center justify-center bg-surface border border-border rounded-md hover:bg-surface-2 transition-colors"
+                                >
+                                    <app-icon name="plus" size="sm" className="text-text-muted" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Total Price -->
+                        <div class="mb-6 p-4 bg-surface-2 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-medium text-text-muted">
+                                    Total Price:
+                                </span>
+                                <span class="text-2xl font-bold text-text">
+                                    ${{ totalPrice() }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Add to Cart Button -->
+                        <button
+                            (click)="onAddToCart()"
+                            class="w-full px-6 py-3 bg-primary hover:bg-accent text-primary-foreground text-lg font-medium rounded-md transition-colors"
+                        >
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </app-card>
+        }
+    </div>
+</div>

@@ -1,0 +1,10 @@
+<div
+    [ngClass]="{
+        'shadow-card': shadow(),
+        'hover:shadow-lg transition-shadow': hoverable(),
+        'h-full': fullHeight()
+    }"
+    class="bg-surface rounded-xl border border-border {{ paddingClass() }}"
+>
+    <ng-content />
+</div>

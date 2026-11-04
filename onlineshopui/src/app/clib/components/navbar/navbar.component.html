@@ -1,0 +1,165 @@
+<nav class="fixed inset-x-0 top-0 z-50 bg-surface/80 backdrop-blur border-b border-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo -->
+            <div class="flex items-center gap-2">
+                <img src="/logo.svg" alt="Online Shop" class="w-10 h-10" />
+                <span class="text-xl font-semibold text-text tracking-tight">Online Shop</span>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center gap-6">
+                <a
+                    [routerLink]="productsRootLink"
+                    routerLinkActive="text-primary font-semibold"
+                    class="text-text hover:text-primary transition-colors"
+                >
+                    Products
+                </a>
+                <a
+                    [routerLink]="ordersLink"
+                    routerLinkActive="text-primary font-semibold"
+                    class="text-text hover:text-primary transition-colors"
+                >
+                    Orders
+                </a>
+                <a
+                    [routerLink]="cartLink"
+                    routerLinkActive="text-primary font-semibold"
+                    class="text-text hover:text-primary transition-colors"
+                >
+                    Cart
+                </a>
+            </div>
+
+            <!-- Right Section: Theme Toggle + Auth -->
+            <div class="hidden md:flex items-center gap-4">
+                <!-- Theme Toggle -->
+                <button
+                    (click)="toggleTheme()"
+                    class="p-2 rounded-full text-text-muted hover:bg-surface-2 transition-colors"
+                    type="button"
+                >
+                    @if (themeService.isDarkMode()) {
+                        <app-icon name="sun" size="sm" />
+                    } @else {
+                        <app-icon name="moon" size="sm" />
+                    }
+                </button>
+
+                <!-- Auth Buttons -->
+                @if (!authService.isAuthenticated()) {
+                    <a
+                        [routerLink]="loginLink"
+                        class="px-4 py-2 text-text hover:text-primary transition-colors"
+                    >
+                        Login
+                    </a>
+                    <a
+                        [routerLink]="registerLink"
+                        class="px-4 py-2 rounded-full bg-primary hover:bg-accent text-primary-foreground font-medium transition-colors"
+                    >
+                        Register
+                    </a>
+                } @else {
+                    <span class="text-sm text-text">
+                        {{ userEmail() ?? 'Unknown user' }}
+                    </span>
+                    <button
+                        (click)="logout()"
+                        type="button"
+                        class="px-4 py-2 rounded-full border border-border hover:bg-surface-2 text-text font-medium transition-colors"
+                    >
+                        Logout
+                    </button>
+                }
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button
+                (click)="toggleMobileMenu()"
+                type="button"
+                class="md:hidden p-2 rounded-full text-text-muted hover:bg-surface-2 transition-colors"
+            >
+                <app-icon name="menu" size="md" />
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    @if (showMobileMenu()) {
+        <div class="md:hidden border-t border-border bg-surface">
+            <div class="px-4 py-3 space-y-2">
+                <a
+                    [routerLink]="productsRootLink"
+                    (click)="closeMobileMenu()"
+                    routerLinkActive="text-primary font-semibold"
+                    class="block px-3 py-2 text-text hover:bg-surface-2 rounded-lg transition-colors"
+                >
+                    Products
+                </a>
+                <a
+                    [routerLink]="ordersLink"
+                    (click)="closeMobileMenu()"
+                    routerLinkActive="text-primary font-semibold"
+                    class="block px-3 py-2 text-text hover:bg-surface-2 rounded-lg transition-colors"
+                >
+                    Orders
+                </a>
+                <a
+                    [routerLink]="cartLink"
+                    (click)="closeMobileMenu()"
+                    routerLinkActive="text-primary font-semibold"
+                    class="block px-3 py-2 text-text hover:bg-surface-2 rounded-lg transition-colors"
+                >
+                    Cart
+                </a>
+                <div class="border-t border-border pt-2 mt-2">
+                    <button
+                        (click)="toggleTheme()"
+                        type="button"
+                        class="w-full flex items-center gap-2 px-3 py-2 text-text hover:bg-surface-2 rounded-lg transition-colors"
+                    >
+                        @if (themeService.isDarkMode()) {
+                            <app-icon name="sun" size="sm" />
+                            <span>Light Mode</span>
+                        } @else {
+                            <app-icon name="moon" size="sm" />
+                            <span>Dark Mode</span>
+                        }
+                    </button>
+                </div>
+
+                <div class="border-t border-border pt-2 mt-2">
+                    @if (!authService.isAuthenticated()) {
+                        <a
+                            [routerLink]="loginLink"
+                            (click)="closeMobileMenu()"
+                            class="block px-3 py-2 text-text hover:bg-surface-2 rounded-lg transition-colors"
+                        >
+                            Login
+                        </a>
+                        <a
+                            [routerLink]="registerLink"
+                            (click)="closeMobileMenu()"
+                            class="block px-3 py-2 mt-2 text-center rounded-full bg-primary hover:bg-accent text-primary-foreground font-medium transition-colors"
+                        >
+                            Register
+                        </a>
+                    } @else {
+                        <div class="px-3 py-2 text-sm text-text">
+                            {{ userEmail() ?? 'Unknown user' }}
+                        </div>
+                        <button
+                            (click)="logout()"
+                            type="button"
+                            class="w-full px-3 py-2 mt-2 text-left rounded-lg border border-border hover:bg-surface-2 text-text font-medium transition-colors"
+                        >
+                            Logout
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</nav>

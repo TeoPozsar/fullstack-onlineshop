@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/shopdb
+    username: shopuser
+    password: shoppassword
+
+  flyway:
+    locations: classpath:db/migration,classpath:db/migration/local
+
+app:
+  cors:
+    allowed-origins: http://localhost:4200
+  jwt:
+    secret: bXlTZWNyZXRLZXlGb3JPbmxpbmVTaG9wQVBJMTIzNDU2Nzg=

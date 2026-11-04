@@ -1,0 +1,5 @@
+app:
+  cors:
+    allowed-origins: http://localhost:4200
+  jwt:
+    secret: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY=
