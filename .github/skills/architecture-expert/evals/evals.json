@@ -1,0 +1,38 @@
+{
+  "skill_name": "architecture-expert",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "How does a logged-in user create an order, and where does the application decide which warehouse ships each item?",
+      "expected_output": "A source-grounded explanation of the frontend request, backend authentication and order flow, transactional persistence, and the configurable allocation strategy.",
+      "files": [],
+      "expectations": [
+        "Explains that the cart is sent through the frontend order service to the authenticated order endpoint and is processed transactionally.",
+        "Distinguishes SINGLE_LOCATION from MOST_ABUNDANT allocation and identifies the backend strategy configuration as the decision point.",
+        "Cites docs/ARCHITECTURE.md as well as implementation evidence."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Why does this project use both Angular route guards and Spring Security role checks for administrator product management?",
+      "expected_output": "An explanation that separates client navigation control from backend authorization, identifies the relevant guards and controller restrictions, and states the server-side security boundary.",
+      "files": [],
+      "expectations": [
+        "Separates Angular navigation control from server-side authorization.",
+        "Identifies rolesGuard and the ADMIN restriction on product mutation endpoints.",
+        "Cites docs/ARCHITECTURE.md as well as implementation evidence."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "What changes when the frontend runs in mock mode instead of against the local API?",
+      "expected_output": "An explanation of Angular environment replacement, the mock API URL and interceptor, the features handled locally, and the unchanged client-side authentication interceptor behavior.",
+      "files": [],
+      "expectations": [
+        "Explains that mock mode replaces the API base URL and handles matching requests through an Angular HTTP interceptor.",
+        "Explains that handled mock data stays in browser memory rather than reaching the Spring API or PostgreSQL.",
+        "Cites docs/ARCHITECTURE.md as well as implementation evidence."
+      ]
+    }
+  ]
+}
