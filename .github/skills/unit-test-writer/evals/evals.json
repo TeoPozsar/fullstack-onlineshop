@@ -1,0 +1,45 @@
+{
+  "skill_name": "unit-test-writer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write focused Mockito unit tests for `onlineshopapi/src/main/java/msg/onlineshopapi/service/OrderService.java`. Cover a successful order with stock deductions and the missing-user failure. Do not change production code.",
+      "expected_output": "A unit test class that mocks OrderService collaborators, validates the requested public behavior, follows existing JUnit 5/Mockito/AssertJ conventions, and reports a targeted Maven test result.",
+      "files": [
+        "onlineshopapi/src/main/java/msg/onlineshopapi/service/OrderService.java"
+      ],
+      "expectations": [
+        "The generated OrderService test uses MockitoExtension with mocks for OrderRepository, StockRepository, UserRepository, and OrderStrategy.",
+        "The success scenario verifies user assignment, generated order details, stock deduction, and persistence interactions without starting Spring or Testcontainers.",
+        "The missing-user scenario asserts ResourceNotFoundException and avoids invoking the allocation strategy.",
+        "The response includes the planned scenarios, complete test code, assumptions, and an honest test-validation result."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Generate unit tests for the backend service that checks customer ownership before returning an order. I need the authorized-user success case and the access-denied exception. Inspect the repository first and ask if the intended exception is not clear.",
+      "expected_output": "An implementation-informed test plan, a focused Mockito unit test or a clarification question if no matching behavior can be identified, and no production-code changes.",
+      "files": [],
+      "expectations": [
+        "The response inspects the backend before proposing code.",
+        "When no public ownership-checking behavior and access-denied exception can be verified, the response asks a focused clarification question instead of inventing a class, method, or exception.",
+        "The response does not modify production code or propose an integration test."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Improve the unit tests for the most-abundant stock allocation strategy so they cover one missing product and sufficient stock across different locations. Keep the tests isolated; do not start Spring or Testcontainers.",
+      "expected_output": "A focused update to the existing unit test using Mockito and AssertJ, with behavior-oriented cases and a targeted Maven test result.",
+      "files": [
+        "onlineshopapi/src/main/java/msg/onlineshopapi/service/strategy/MostAbundantStrategy.java",
+        "onlineshopapi/src/test/java/msg/onlineshopapi/unit/service/strategy/MostAbundantStrategyTest.java"
+      ],
+      "expectations": [
+        "The updated test remains a Mockito unit test using MockitoExtension and does not use SpringBootTest or Testcontainers.",
+        "It covers the missing-product failure by stubbing the stock repository with no stock for one requested product and asserting OrderNotProcessableException.",
+        "It covers sufficient stock for products allocated from different locations and asserts the returned stocks or locations.",
+        "The response contains a behavior-based scenario list and an honest targeted Maven validation result."
+      ]
+    }
+  ]
+}
