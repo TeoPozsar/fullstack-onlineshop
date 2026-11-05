@@ -153,5 +153,16 @@ describe('OrderDetailPageComponent', () => {
             expect(totalAmount).toBeDefined();
             expect(typeof totalAmount).toBe('string');
         });
+
+        it('should render legacy orders without an address', () => {
+            // Prepare
+            ordersServiceMock.selectedOrder.set({ ...MOCK_ORDERS[0], address: null });
+
+            // Action
+            fixture.detectChanges();
+
+            // Verify
+            expect(fixture.nativeElement.textContent).toContain('Address unavailable');
+        });
     });
 });

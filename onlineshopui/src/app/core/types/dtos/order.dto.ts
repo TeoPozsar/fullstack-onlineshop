@@ -5,7 +5,7 @@ export type OrderDto = {
     id: string;
     userId: string;
     createdAt: string;
-    address: AddressDto;
+    address: AddressDto | null;
     details?: OrderDetailsDto[];
 };
 
@@ -23,4 +23,5 @@ export type CreateOrderItemDto = {
 
 export type CreateOrderDto = {
     items: CreateOrderItemDto[];
+    address: AddressDto;
 };

@@ -14,6 +14,12 @@ describe('OrdersService', () => {
 
     const mockOrder = MOCK_ORDERS[0];
     const mockOrders = MOCK_ORDERS;
+    const createOrderAddress = {
+        country: 'USA',
+        city: 'Seattle',
+        county: 'King',
+        streetAddress: '123 Pine Street'
+    };
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -232,7 +238,8 @@ describe('OrdersService', () => {
                         productId: 'prod-3',
                         quantity: 1
                     }
-                ]
+                ],
+                address: createOrderAddress
             };
 
             const createdOrder: OrderDto = {
@@ -277,7 +284,8 @@ describe('OrdersService', () => {
                         productId: 'prod-2',
                         quantity: 1
                     }
-                ]
+                ],
+                address: createOrderAddress
             };
 
             // Action
@@ -298,7 +306,8 @@ describe('OrdersService', () => {
                         productId: 'prod-1',
                         quantity: 1
                     }
-                ]
+                ],
+                address: createOrderAddress
             };
 
             // Action

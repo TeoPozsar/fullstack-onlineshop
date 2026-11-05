@@ -13,7 +13,7 @@
             <button
                 type="button"
                 (click)="onCheckout()"
-                [disabled]="isSubmitting()"
+                [disabled]="isSubmitting() || checkoutDisabled()"
                 class="w-full px-4 py-2 rounded-md bg-primary hover:bg-accent text-primary-foreground font-medium transition-colors disabled:opacity-50"
             >
                 Place Order
