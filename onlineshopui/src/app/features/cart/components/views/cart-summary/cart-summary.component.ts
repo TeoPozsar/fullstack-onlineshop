@@ -11,6 +11,7 @@ export class CartSummaryComponent {
     subtotal = input.required<string>();
     itemCount = input.required<number>();
     isSubmitting = input<boolean>(false);
+    checkoutDisabled = input<boolean>(false);
 
     checkout = output<void>();
     clear = output<void>();
