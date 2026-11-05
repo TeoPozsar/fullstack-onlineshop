@@ -1,0 +1,41 @@
+{
+  "skill_name": "bug-fixer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Login succeeds, but navigating to a protected customer route redirects the user back to the login page. Investigate the Angular authentication state, route guards, interceptor, route configuration, and relevant tests. Find the root cause from repository evidence, make the smallest safe repair only if the evidence supports one, and verify it. Do not weaken authentication or authorization to make the symptom disappear.",
+      "expected_output": "An evidence-backed diagnosis of the protected-route redirect, a minimal repair only when warranted, focused regression coverage when appropriate, and honest Angular validation.",
+      "files": [],
+      "expectations": [
+        "The report examines the authentication service or state, protected-route guards, route configuration, and the auth interceptor or their directly relevant tests.",
+        "The report distinguishes verified evidence from assumptions and does not assert a specific root cause when the symptom cannot be reproduced or tied to a concrete route and role.",
+        "The proposed repair, if any, preserves authentication and role authorization rather than bypassing a guard or broadly allowing protected routes.",
+        "The report supplies a focused regression-test plan and an honest relevant Angular validation result or blocker."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A customer registration request to the Spring Boot API fails unexpectedly. Trace the registration controller, request DTO and mapper, service logic, validation, exception handling, and related tests. Identify the actual cause from evidence, implement the smallest safe fix if a code defect is confirmed, and validate it. Do not bypass validation, expose credentials, or change unrelated authentication behavior.",
+      "expected_output": "An evidence-backed backend registration diagnosis, a narrow repair only when warranted, appropriate regression coverage, and honest Maven validation.",
+      "files": [],
+      "expectations": [
+        "The report traces the registration controller, request DTO, mapper, service, and relevant validation or exception-handling path.",
+        "The report asks for or explicitly identifies the missing request, response status, error payload, or log evidence when those are required to establish a root cause.",
+        "The report does not propose bypassing validation, duplicate-email handling, password encoding, or authentication to make registration succeed.",
+        "The report provides a focused regression-test plan and an honest Maven validation result or blocker."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Registration works in Angular mock mode but fails against the local Spring Boot API. Trace the frontend registration request, environment/API configuration, backend endpoint, DTO contract, mapper, service, and error handling. Determine which layer owns the defect from evidence, implement the smallest safe contract-compatible fix if confirmed, and validate the relevant frontend and backend behavior. Do not paper over the failure with permissive CORS, authentication, or validation changes.",
+      "expected_output": "An evidence-backed cross-stack registration diagnosis, a minimal contract-preserving repair at the owning layer, regression coverage when appropriate, and honest validation results.",
+      "files": [],
+      "expectations": [
+        "The report inspects both the Angular registration request and mock/environment configuration, plus the Spring registration endpoint, request DTO, mapper, and service.",
+        "The report compares the actual frontend request contract with the local API contract before selecting an owning layer or a repair.",
+        "The report does not prescribe permissive CORS, authentication, or validation changes as a substitute for diagnosing the contract mismatch.",
+        "The report provides cross-stack regression coverage or a concrete testing plan and honest frontend/backend validation results or blockers."
+      ]
+    }
+  ]
+}

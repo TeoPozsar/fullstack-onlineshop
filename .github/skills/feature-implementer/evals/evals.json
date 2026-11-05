@@ -1,0 +1,23 @@
+{
+  "skill_name": "feature-implementer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Add client-side sorting controls to the customer orders overview for newest and oldest orders. Preserve the existing loading, error, retry, and order-detail navigation behavior. Follow current Angular patterns, add focused tests, and validate the change.",
+      "expected_output": "A planned, minimal Angular-only implementation that reuses the order feature's signals and components, preserves existing states, adds focused coverage, and reports validation.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Add a customer-safe order lookup endpoint that returns only the authenticated user's order history. Preserve authorization boundaries, follow existing Spring controller/service/DTO conventions, add focused controller and service tests, and validate the implementation.",
+      "expected_output": "A planned, narrow Spring feature that derives ownership from the authenticated identity rather than client input, includes focused tests, and reports Maven validation.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Add product filtering by category from an Angular product-list control through a typed API contract to Spring service and repository behavior. Keep mock mode aligned, preserve existing product behavior, add focused frontend and backend coverage, and validate both layers.",
+      "expected_output": "A plan-first cross-stack implementation with an aligned Angular/API/mock contract, minimal changes at each layer, regression tests, and honest validation.",
+      "files": []
+    }
+  ]
+}
