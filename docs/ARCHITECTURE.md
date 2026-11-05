@@ -49,8 +49,9 @@ All paths are relative to `/api`.
 | Resource | Endpoints | Access |
 |---|---|---|
 | Authentication | `POST /auth/register`, `POST /auth/login`, `GET /auth/profile` | Registration and login are public; profile requires authentication |
-| Products | `GET /products`, `GET /products/{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` | Authentication required; writes require `ADMIN` |
+| Products | `GET /products`, `GET /products/{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` | Authentication required; writes require `ADMIN`; create/update include required supplier ID and responses include supplier |
 | Categories | `GET /products/categories`, `GET /products/categories/{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` | Authentication required; writes require `ADMIN` |
+| Suppliers | `GET /suppliers`, `GET /suppliers/{id}` | Authentication required; read-only |
 | Orders | `GET /orders`, `GET /orders/{id}`, `POST /orders` | Authentication required |
 
 Spring Security permits only registration, login, and OpenAPI/Swagger paths without a token. `@PreAuthorize` adds the `ADMIN` restriction to product and category writes. Springdoc publishes the OpenAPI definition and Swagger UI.
@@ -118,7 +119,7 @@ sequenceDiagram
     HTTP-->>UI: Typed observable response
 ```
 
-The development environment targets `http://localhost:3000/api`. The production and default environments use the `${API_URL}` placeholder. The mock environment targets `http://mock-api`; its interceptor responds locally for authentication, products, and orders with a simulated delay, allowing frontend development without the backend.
+The development environment targets `http://localhost:3000/api`. The production and default environments use the `${API_URL}` placeholder. The mock environment targets `http://mock-api`; its interceptor responds locally for authentication, products (including suppliers), and orders with a simulated delay, allowing frontend development without the backend.
 
 ## Database
 
@@ -127,7 +128,8 @@ Flyway owns the PostgreSQL schema. The base migration is `onlineshopapi/src/main
 | Table | Purpose and relationships |
 |---|---|
 | `product_categories` | Holds category data for products |
-| `products` | Holds catalogue items; each product references a category |
+| `suppliers` | Holds supplier names and optional contact and address data |
+| `products` | Holds catalogue items; each product references a category and a required supplier |
 | `locations` | Holds stock and shipping locations |
 | `stocks` | Holds quantity per product and location; primary key: `product_id`, `location_id` |
 | `users` | Holds user identities and roles; email is unique |

@@ -25,8 +25,11 @@ export class ProductUpdatePageComponent implements OnInit {
     readonly form = createProductForm();
     readonly product = this.productService.selectedProduct;
     readonly categories = this.productService.categories;
+    readonly suppliers = this.productService.suppliers;
     readonly loading = this.productService.loading;
     readonly error = this.productService.error;
+    readonly supplierLoading = this.productService.supplierLoading;
+    readonly supplierError = this.productService.supplierError;
     readonly isSubmitting = signal(false);
     private readonly productId = signal<string | null>(null);
 
@@ -40,7 +43,8 @@ export class ProductUpdatePageComponent implements OnInit {
                     price: prod.price,
                     weight: prod.weight,
                     imageUrl: prod.imageUrl,
-                    categoryId: prod.category.id
+                    categoryId: prod.category.id,
+                    supplierId: prod.supplier.id
                 });
             }
         });
@@ -61,6 +65,7 @@ export class ProductUpdatePageComponent implements OnInit {
             this.productId.set(id);
             this.productService.loadById(id).pipe(take(1)).subscribe();
             this.productService.loadCategories().pipe(take(1)).subscribe();
+            this.productService.loadSuppliers().pipe(take(1)).subscribe();
         } else {
             this.router.navigate([
                 `/${AppNavRoutes.Products.root}/${AppNavRoutes.Products.features.overview}`
@@ -84,7 +89,8 @@ export class ProductUpdatePageComponent implements OnInit {
             price: formValue.price,
             weight: formValue.weight,
             imageUrl: formValue.imageUrl,
-            categoryId: formValue.categoryId
+            categoryId: formValue.categoryId,
+            supplierId: formValue.supplierId
         };
 
         this.isSubmitting.set(true);
@@ -124,6 +130,11 @@ export class ProductUpdatePageComponent implements OnInit {
         if (id) {
             this.productService.loadById(id).pipe(take(1)).subscribe();
             this.productService.loadCategories().pipe(take(1)).subscribe();
+            this.productService.loadSuppliers().pipe(take(1)).subscribe();
         }
+    }
+
+    retrySuppliers(): void {
+        this.productService.loadSuppliers().pipe(take(1)).subscribe();
     }
 }
