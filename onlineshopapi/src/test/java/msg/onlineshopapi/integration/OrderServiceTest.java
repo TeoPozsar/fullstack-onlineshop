@@ -1,5 +1,6 @@
 package msg.onlineshopapi.integration;
 
+import jakarta.persistence.EntityManager;
 import msg.onlineshopapi.exception.OrderNotProcessableException;
 import msg.onlineshopapi.model.Location;
 import msg.onlineshopapi.model.Order;
@@ -29,6 +30,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -86,6 +89,12 @@ class OrderServiceTest {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     private Product laptop;
     private Supplier supplier;
@@ -305,7 +314,11 @@ class OrderServiceTest {
 
         assertThat(orderDetailRepository.findAll()).hasSize(2);
         OrderDetail duplicate = orderDetail(order, secondLocation, 4);
-        assertThatThrownBy(() -> orderDetailRepository.saveAndFlush(duplicate))
+        assertThatThrownBy(() -> new TransactionTemplate(transactionManager)
+                .executeWithoutResult(status -> {
+                    entityManager.persist(duplicate);
+                    entityManager.flush();
+                }))
                 .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
     }
 

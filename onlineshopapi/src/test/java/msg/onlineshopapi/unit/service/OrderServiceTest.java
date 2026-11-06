@@ -1,5 +1,6 @@
 package msg.onlineshopapi.unit.service;
 
+import msg.onlineshopapi.exception.OrderNotProcessableException;
 import msg.onlineshopapi.exception.ResourceNotFoundException;
 import msg.onlineshopapi.model.Location;
 import msg.onlineshopapi.model.Order;
@@ -147,6 +148,35 @@ class OrderServiceTest {
                 .isInstanceOf(msg.onlineshopapi.exception.OrderNotProcessableException.class)
                 .hasMessageContaining(productId.toString());
         verifyNoInteractions(orderRepository, stockRepository);
+    }
+
+    @Test
+    void createOrder_rejectsNonPositiveQuantityBeforeIteratingCandidates() {
+        UUID productId = UUID.randomUUID();
+        Product product = product(productId);
+        Order order = order(UUID.randomUUID(), orderDetail(product, 0));
+
+        when(userRepository.findByEmail("customer@example.com"))
+                .thenReturn(Optional.of(User.builder().email("customer@example.com").build()));
+
+        assertThatThrownBy(() -> orderService.createOrder(order, "customer@example.com"))
+                .isInstanceOf(OrderNotProcessableException.class)
+                .hasMessage("Order quantities must be greater than zero");
+        verifyNoInteractions(orderRepository, stockRepository, orderStrategy);
+    }
+
+    @Test
+    void createOrder_rejectsNonPositiveQuantityBeforeLookingUpCandidates() {
+        Product product = product(UUID.randomUUID());
+        Order order = order(UUID.randomUUID(), orderDetail(product, -1));
+
+        when(userRepository.findByEmail("customer@example.com"))
+                .thenReturn(Optional.of(User.builder().email("customer@example.com").build()));
+
+        assertThatThrownBy(() -> orderService.createOrder(order, "customer@example.com"))
+                .isInstanceOf(OrderNotProcessableException.class)
+                .hasMessage("Order quantities must be greater than zero");
+        verifyNoInteractions(orderRepository, stockRepository, orderStrategy);
     }
 
     @Test

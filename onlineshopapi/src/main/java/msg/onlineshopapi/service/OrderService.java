@@ -42,6 +42,7 @@ public class OrderService {
     @Transactional
     public Order createOrder(Order order, String email) {
         resolveUser(order, email);
+        validateQuantities(order.getOrderDetails());
         Set<OrderDetail> orderDetails = mergeDuplicateProducts(order.getOrderDetails());
         Map<UUID, Integer> quantityByProduct = orderDetails.stream()
                 .collect(Collectors.toMap(d -> d.getProduct().getId(), OrderDetail::getQuantity));
@@ -55,6 +56,13 @@ public class OrderService {
         order.getOrderDetails().addAll(buildOrderDetails(order, allocations));
         deductStock(allocations);
         return orderRepository.save(order);
+    }
+
+    private void validateQuantities(Set<OrderDetail> orderDetails) {
+        if (orderDetails.stream().anyMatch(detail ->
+                detail.getQuantity() == null || detail.getQuantity() <= 0)) {
+            throw new OrderNotProcessableException("Order quantities must be greater than zero");
+        }
     }
 
     private Set<OrderDetail> mergeDuplicateProducts(Set<OrderDetail> orderDetails) {
@@ -89,6 +97,10 @@ public class OrderService {
         for (Map.Entry<UUID, Integer> entry : quantityByProduct.entrySet()) {
             UUID productId = entry.getKey();
             int remaining = entry.getValue();
+            if (remaining <= 0) {
+                throw new OrderNotProcessableException(
+                        "Order quantity must be greater than zero for product: " + productId);
+            }
             for (Stock stock : stocksByProduct.getOrDefault(productId, List.of())) {
                 if (!productId.equals(stock.getProduct().getId())) {
                     throw new IllegalStateException("Stock does not belong to requested product: " + productId);
