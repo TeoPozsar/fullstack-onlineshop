@@ -1,5 +1,10 @@
 {
     "app": {
         "name": "Online Shop"
+    },
+    "language": {
+        "switch": "Sprache wechseln",
+        "en": "EN",
+        "de": "DE"
     }
 }
