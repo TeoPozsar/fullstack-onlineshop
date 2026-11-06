@@ -164,24 +164,28 @@
             "orderPlacedMessage": "Ihre Bestellung wird bearbeitet.",
             "orderFailed": "Bestellung fehlgeschlagen",
             "orderFailedMessage": "Bitte versuchen Sie es gleich noch einmal."
+        }
+    },
+    "orders": {
+        "title": "Bestellungen",
+        "subtitle": "Verfolgen Sie Ihre letzten Einkäufe.",
+        "empty": "Noch keine Bestellungen.",
+        "labels": {
+            "order": "Bestellung",
+            "items": "Artikel",
+            "total": "Gesamt",
+            "shipTo": "Lieferadresse",
+            "addressUnavailable": "Adresse nicht verfügbar",
+            "quantity": "Menge"
         },
-        "orders": {
-            "title": "Bestellungen",
-            "subtitle": "Verfolgen Sie Ihre letzten Einkäufe.",
-            "empty": "Noch keine Bestellungen.",
-            "labels": {
-                "order": "Bestellung",
-                "items": "Artikel",
-                "total": "Gesamt",
-                "shipTo": "Lieferadresse",
-                "addressUnavailable": "Adresse nicht verfügbar",
-                "quantity": "Menge"
-            },
-            "actions": {
-                "tryAgain": "Erneut versuchen",
-                "viewDetails": "Details anzeigen",
-                "backToOrders": "Zurück zu Bestellungen"
-            }
+        "actions": {
+            "tryAgain": "Erneut versuchen",
+            "viewDetails": "Details anzeigen",
+            "backToOrders": "Zurück zu Bestellungen"
+        },
+        "errors": {
+            "loadAll": "Bestellungen konnten nicht geladen werden",
+            "loadOne": "Bestellung konnte nicht geladen werden"
         }
     }
 }

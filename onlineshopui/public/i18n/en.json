@@ -164,24 +164,28 @@
             "orderPlacedMessage": "Your order is being processed.",
             "orderFailed": "Order failed",
             "orderFailedMessage": "Please try again in a moment."
+        }
+    },
+    "orders": {
+        "title": "Orders",
+        "subtitle": "Track your recent purchases.",
+        "empty": "No orders yet.",
+        "labels": {
+            "order": "Order",
+            "items": "Items",
+            "total": "Total",
+            "shipTo": "Ship To",
+            "addressUnavailable": "Address unavailable",
+            "quantity": "Qty"
         },
-        "orders": {
-            "title": "Orders",
-            "subtitle": "Track your recent purchases.",
-            "empty": "No orders yet.",
-            "labels": {
-                "order": "Order",
-                "items": "Items",
-                "total": "Total",
-                "shipTo": "Ship To",
-                "addressUnavailable": "Address unavailable",
-                "quantity": "Qty"
-            },
-            "actions": {
-                "tryAgain": "Try Again",
-                "viewDetails": "View Details",
-                "backToOrders": "Back to Orders"
-            }
+        "actions": {
+            "tryAgain": "Try Again",
+            "viewDetails": "View Details",
+            "backToOrders": "Back to Orders"
+        },
+        "errors": {
+            "loadAll": "Failed to load orders",
+            "loadOne": "Failed to load order"
         }
     }
 }

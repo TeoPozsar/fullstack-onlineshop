@@ -1,4 +1,6 @@
 import { HttpClient } from '@angular/common/http';
+import { computed } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable, tap, finalize, catchError, of, map } from 'rxjs';
 import {
@@ -17,6 +19,10 @@ export class ProductService {
     private readonly http = inject(HttpClient);
     private readonly environmentConfig = inject(EnvironmentConfig);
     private readonly translocoService = inject(TranslocoService);
+    private readonly languageChanges = toSignal(
+        this.translocoService.langChanges$ ?? of('en'),
+        { initialValue: 'en' }
+    );
     private readonly productsUrl = `${this.environmentConfig.apiUrl}/products`;
     private readonly categoriesUrl = `${this.environmentConfig.apiUrl}/products/categories`;
 
@@ -24,23 +30,28 @@ export class ProductService {
     private readonly _selectedProduct = signal<ProductDto | null>(null);
     private readonly _categories = signal<ProductCategoryDto[]>([]);
     private readonly _loading = signal(false);
-    private readonly _error = signal<string | null>(null);
+    private readonly _errorKey = signal<string | null>(null);
 
     readonly products = this._products.asReadonly();
     readonly selectedProduct = this._selectedProduct.asReadonly();
     readonly categories = this._categories.asReadonly();
     readonly loading = this._loading.asReadonly();
-    readonly error = this._error.asReadonly();
+    readonly errorKey = this._errorKey.asReadonly();
+    readonly error = computed(() => {
+        this.languageChanges();
+        const key = this._errorKey();
+        return key ? this.translocoService.translate(key) : null;
+    });
 
     loadAll(): Observable<void> {
         this._loading.set(true);
-        this._error.set(null);
+        this._errorKey.set(null);
 
         return this.http.get<ProductDto[]>(this.productsUrl).pipe(
             tap(products => this._products.set(products)),
-            tap(() => this._error.set(null)),
+            tap(() => this._errorKey.set(null)),
             catchError(() => {
-                this._error.set(this.translocoService.translate('products.errors.loadAll'));
+                this._errorKey.set('products.errors.loadAll');
                 return of([]);
             }),
             finalize(() => this._loading.set(false)),
@@ -50,13 +61,13 @@ export class ProductService {
 
     loadById(id: string): Observable<void> {
         this._loading.set(true);
-        this._error.set(null);
+        this._errorKey.set(null);
 
         return this.http.get<ProductDto>(`${this.productsUrl}/${id}`).pipe(
             tap(product => this._selectedProduct.set(product)),
-            tap(() => this._error.set(null)),
+            tap(() => this._errorKey.set(null)),
             catchError(() => {
-                this._error.set(this.translocoService.translate('products.errors.loadOne'));
+                this._errorKey.set('products.errors.loadOne');
                 this._selectedProduct.set(null);
                 return of(null);
             }),
@@ -67,13 +78,13 @@ export class ProductService {
 
     loadCategories(): Observable<void> {
         this._loading.set(true);
-        this._error.set(null);
+        this._errorKey.set(null);
 
         return this.http.get<ProductCategoryDto[]>(this.categoriesUrl).pipe(
             tap(categories => this._categories.set(categories)),
-            tap(() => this._error.set(null)),
+            tap(() => this._errorKey.set(null)),
             catchError(() => {
-                this._error.set(this.translocoService.translate('products.errors.categories'));
+                this._errorKey.set('products.errors.categories');
                 return of([]);
             }),
             finalize(() => this._loading.set(false)),

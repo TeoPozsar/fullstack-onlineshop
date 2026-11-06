@@ -19,7 +19,7 @@
                     (click)="retry()"
                     class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
                 >
-                    Try Again
+                    {{ 'orders.actions.tryAgain' | transloco }}
                 </button>
             </div>
         }
@@ -59,7 +59,7 @@
                             <div class="text-right">
                                 <div class="text-sm text-text-muted">{{ 'orders.labels.total' | transloco }}</div>
                                 <div class="text-2xl font-semibold text-text">
-                                    ${{ totalAmount() }}
+                                    {{ totalAmount() }}
                                 </div>
                             </div>
                         </div>
