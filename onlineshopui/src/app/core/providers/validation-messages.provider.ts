@@ -1,10 +1,18 @@
-import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
+import {
+    EnvironmentProviders,
+    makeEnvironmentProviders,
+    ProviderToken
+} from '@angular/core';
 import { ValidationMessages, ValidationMessagesMap } from '../types/providers/validation-messages';
 
-export const provideValidationMessages = (messages: ValidationMessagesMap): EnvironmentProviders =>
+export const provideValidationMessages = <T>(
+    factory: (dependency: T) => ValidationMessagesMap,
+    dependency: ProviderToken<T>
+): EnvironmentProviders =>
     makeEnvironmentProviders([
         {
             provide: ValidationMessages,
-            useValue: messages
+            useFactory: factory,
+            deps: [dependency]
         }
     ]);

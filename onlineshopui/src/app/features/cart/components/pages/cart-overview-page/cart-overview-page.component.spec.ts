@@ -12,7 +12,8 @@ import { MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
 import { MOCK_ORDERS } from '../../../../../core/mocks/data/orders.mock';
 import { signal } from '@angular/core';
 import { ValidationMessages } from '../../../../../core/types/providers/validation-messages';
-import { DefaultValidationMessages } from '../../../../../core/config/constants/validation.constants';
+import { createDefaultValidationMessages } from '../../../../../core/config/constants/validation.constants';
+import { TranslocoService } from '@jsverse/transloco';
 
 const checkoutAddress = {
     country: 'USA',
@@ -22,6 +23,11 @@ const checkoutAddress = {
 };
 
 describe('CartOverviewPageComponent', () => {
+    const translocoServiceMock = {
+        langChanges$: of('en'),
+        getActiveLang: vi.fn().mockReturnValue('en'),
+        translate: vi.fn().mockImplementation((key: string) => key)
+    };
     let component: CartOverviewPageComponent;
     let fixture: ComponentFixture<CartOverviewPageComponent>;
     let cartServiceMock: {
@@ -88,7 +94,11 @@ describe('CartOverviewPageComponent', () => {
                 { provide: OrdersService, useValue: ordersServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
-                { provide: ValidationMessages, useValue: DefaultValidationMessages }
+                {
+                    provide: ValidationMessages,
+                    useValue: createDefaultValidationMessages(translocoServiceMock)
+                },
+                { provide: TranslocoService, useValue: translocoServiceMock }
             ]
         });
 

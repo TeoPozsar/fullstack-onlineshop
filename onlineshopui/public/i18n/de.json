@@ -6,5 +6,31 @@
         "switch": "Sprache wechseln",
         "en": "EN",
         "de": "DE"
+    },
+    "validation": {
+        "required": "Dieses Feld ist erforderlich",
+        "min": "Der Mindestwert ist {{min}}",
+        "max": "Der Höchstwert ist {{max}}",
+        "minlength": "Die Mindestlänge beträgt {{requiredLength}} Zeichen",
+        "maxlength": "Die Maximallänge beträgt {{requiredLength}} Zeichen",
+        "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+        "pattern": "Bitte geben Sie ein gültiges Format ein",
+        "url": "Bitte geben Sie eine gültige URL ein",
+        "unknown": "Validierungsfehler: {{key}}"
+    },
+    "common": {
+        "close": "Schließen",
+        "loading": "Wird geladen..."
+    },
+    "nav": {
+        "products": "Produkte",
+        "orders": "Bestellungen",
+        "cart": "Warenkorb",
+        "login": "Anmelden",
+        "register": "Registrieren",
+        "logout": "Abmelden",
+        "unknownUser": "Unbekannter Benutzer",
+        "lightMode": "Heller Modus",
+        "darkMode": "Dunkler Modus"
     }
 }

@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { NotificationsService } from '../../../core/services/notifications.service';
 import { IconComponent } from '../icon/icon.component';
 
 @Component({
     selector: 'app-notification-popup',
     standalone: true,
-    imports: [IconComponent],
+    imports: [IconComponent, TranslocoPipe],
     templateUrl: './notification-popup.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })

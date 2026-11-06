@@ -14,9 +14,15 @@ import {
 } from '../../../../../core/mocks/data/products.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { ValidationMessages } from '../../../../../core/types/providers/validation-messages';
-import { DefaultValidationMessages } from '../../../../../core/config/constants/validation.constants';
+import { createDefaultValidationMessages } from '../../../../../core/config/constants/validation.constants';
+import { TranslocoService } from '@jsverse/transloco';
 
 describe('ProductCreatePageComponent', () => {
+    const translocoServiceMock = {
+        langChanges$: of('en'),
+        getActiveLang: vi.fn().mockReturnValue('en'),
+        translate: vi.fn().mockImplementation((key: string) => key)
+    };
     let component: ProductCreatePageComponent;
     let fixture: ComponentFixture<ProductCreatePageComponent>;
     let productServiceMock: {
@@ -72,7 +78,11 @@ describe('ProductCreatePageComponent', () => {
                 { provide: SupplierService, useValue: supplierServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
-                { provide: ValidationMessages, useValue: DefaultValidationMessages }
+                {
+                    provide: ValidationMessages,
+                    useValue: createDefaultValidationMessages(translocoServiceMock)
+                },
+                { provide: TranslocoService, useValue: translocoServiceMock }
             ]
         });
 

@@ -6,5 +6,31 @@
         "switch": "Switch language",
         "en": "EN",
         "de": "DE"
+    },
+    "validation": {
+        "required": "This field is required",
+        "min": "Minimum value is {{min}}",
+        "max": "Maximum value is {{max}}",
+        "minlength": "Minimum length is {{requiredLength}} characters",
+        "maxlength": "Maximum length is {{requiredLength}} characters",
+        "email": "Please enter a valid email address",
+        "pattern": "Please enter a valid format",
+        "url": "Please enter a valid URL",
+        "unknown": "Validation error: {{key}}"
+    },
+    "common": {
+        "close": "Close",
+        "loading": "Loading..."
+    },
+    "nav": {
+        "products": "Products",
+        "orders": "Orders",
+        "cart": "Cart",
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "unknownUser": "Unknown user",
+        "lightMode": "Light Mode",
+        "darkMode": "Dark Mode"
     }
 }

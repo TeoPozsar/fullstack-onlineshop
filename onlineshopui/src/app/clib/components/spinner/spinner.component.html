@@ -1,5 +1,9 @@
 @if (overlay()) {
-    <div class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50">
+    <div
+        class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50"
+        role="status"
+        [attr.aria-label]="'common.loading' | transloco"
+    >
         <div
             class="animate-spin rounded-full border-4 border-border border-t-primary {{
                 sizeClass()
@@ -7,7 +11,7 @@
         ></div>
     </div>
 } @else {
-    <div class="flex items-center justify-center">
+    <div class="flex items-center justify-center" role="status" [attr.aria-label]="'common.loading' | transloco">
         <div
             class="animate-spin rounded-full border-4 border-border border-t-primary {{
                 sizeClass()

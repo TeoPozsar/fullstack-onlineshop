@@ -1,5 +1,7 @@
 import { Component, input, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
+import { TranslocoService } from '@jsverse/transloco';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
     ValidationMessages,
     ValidationMessagesMap
@@ -21,8 +23,13 @@ export class ErrorMessageComponent {
     control = input.required<AbstractControl | null>();
 
     private readonly validationMessages = inject<ValidationMessagesMap>(ValidationMessages);
+    private readonly translocoService = inject(TranslocoService);
+    private readonly languageChange = toSignal(this.translocoService.langChanges$, {
+        initialValue: this.translocoService.getActiveLang()
+    });
 
     errorMessage = computed(() => {
+        this.languageChange();
         const ctrl = this.control();
         if (!ctrl?.errors || !ctrl.touched) {
             return null;
@@ -37,7 +44,9 @@ export class ErrorMessageComponent {
         const messageFunction = this.validationMessages[firstErrorKey];
 
         if (!messageFunction) {
-            return `Validation error: ${firstErrorKey}`;
+            return this.translocoService.translate('validation.unknown', {
+                key: firstErrorKey
+            });
         }
 
         return messageFunction(ctrl.errors[firstErrorKey]);
