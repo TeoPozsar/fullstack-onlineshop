@@ -1,0 +1,45 @@
+{
+  "skill_name": "commit-pr-writer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just added a quantity stepper (+/- buttons) to the cart line items component in onlineshopui so users don't have to type a number manually. Can you write me a commit message for this?",
+      "expected_output": "A single Conventional Commits message: type feat, scope reflecting cart feature, subject <=72 chars total, imperative mood, no trailing period.",
+      "files": [],
+      "assertions": [
+        "Commit message subject line (type(scope): subject) is 72 characters or fewer",
+        "Commit uses a valid Conventional Commits type (feat/fix/refactor/chore)",
+        "Subject uses imperative mood and has no trailing period",
+        "Scope reflects the cart/cart-line-item feature rather than a vague catch-all",
+        "No PR description sections are produced (not asked for) and no unnecessary breaking-change marker is added"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I changed the /api/auth/login endpoint so it now requires an MFA code as a second step before issuing the JWT - the old response that returned a token directly right after username/password no longer works that way. Write the commit message and a PR description for this.",
+      "expected_output": "Commit message uses feat(auth)! with a BREAKING CHANGE footer. PR description has all four sections (Summary, Architectural Impact, Breaking Changes, Testing Steps), with Breaking Changes populated describing the MFA step and migration guidance, and Testing Steps with concrete repro steps.",
+      "files": [],
+      "assertions": [
+        "Commit message uses the ! breaking-change marker after type(scope) (e.g. feat(auth)!)",
+        "Commit message includes a 'BREAKING CHANGE:' footer explaining what breaks and how to adapt",
+        "Commit subject line (type(scope)!: subject) is 72 characters or fewer",
+        "PR description contains all four exact headers: Summary, Architectural Impact, Breaking Changes, Testing Steps",
+        "Breaking Changes section is populated (not 'None') and describes the MFA step and migration guidance",
+        "Testing Steps are concrete/reproducible (reference real commands or endpoints) rather than generic placeholders"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Fixed a bug in OrderService where double-clicking the checkout button on the frontend could submit the same order twice - added a debounce/disable on the button plus an idempotency check server-side. Need a PR description for this, and also a changelog entry.",
+      "expected_output": "PR description with all four sections; Breaking Changes says 'None.'; Testing Steps are concrete and reproducible. Changelog entry uses Keep a Changelog format under a Fixed heading, phrased in user-facing language.",
+      "files": [],
+      "assertions": [
+        "PR description contains all four exact headers: Summary, Architectural Impact, Breaking Changes, Testing Steps",
+        "Breaking Changes section explicitly states 'None.' since this is a non-breaking fix",
+        "Testing Steps are concrete/reproducible (reference real commands or endpoints) rather than generic placeholders",
+        "Changelog entry uses Keep a Changelog format with a 'Fixed' category heading",
+        "Changelog entry is phrased in user-facing language, not implementation detail"
+      ]
+    }
+  ]
+}
