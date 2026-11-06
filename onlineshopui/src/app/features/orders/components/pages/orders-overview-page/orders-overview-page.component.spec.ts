@@ -7,6 +7,7 @@ import { OrdersOverviewPageComponent } from './orders-overview-page.component';
 import { OrdersService } from '../../../services/orders.service';
 import { MOCK_ORDERS } from '../../../../../core/mocks/data/orders.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
+import { translocoTestingImports } from '../../../../../core/testing/transloco-testing';
 
 describe('OrdersOverviewPageComponent', () => {
     let component: OrdersOverviewPageComponent;
@@ -34,7 +35,7 @@ describe('OrdersOverviewPageComponent', () => {
         };
 
         TestBed.configureTestingModule({
-            imports: [OrdersOverviewPageComponent],
+            imports: [OrdersOverviewPageComponent, ...translocoTestingImports],
             providers: [
                 { provide: OrdersService, useValue: ordersServiceMock },
                 { provide: Router, useValue: routerMock }

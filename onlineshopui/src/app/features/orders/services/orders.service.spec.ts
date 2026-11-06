@@ -7,6 +7,9 @@ import { EnvironmentConfig } from '../../../core/types/providers/environment-con
 import { MOCK_ENVIRONMENT_CONFIG } from '../../../core/mocks/data/environment.mock';
 import { MOCK_ORDERS } from '../../../core/mocks/data/orders.mock';
 import { OrderDto, CreateOrderDto } from '../../../core/types/dtos/order.dto';
+import { translocoTestingImports } from '../../../core/testing/transloco-testing';
+import { TranslocoService } from '@jsverse/transloco';
+import { of } from 'rxjs';
 
 describe('OrdersService', () => {
     let service: OrdersService;
@@ -23,6 +26,7 @@ describe('OrdersService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
+            imports: translocoTestingImports,
             providers: [
                 OrdersService,
                 provideHttpClient(),
@@ -30,6 +34,16 @@ describe('OrdersService', () => {
                 {
                     provide: EnvironmentConfig,
                     useValue: MOCK_ENVIRONMENT_CONFIG
+                },
+                {
+                    provide: TranslocoService,
+                    useValue: {
+                        langChanges$: of('en'),
+                        translate: (key: string) =>
+                            key === 'orders.errors.loadAll'
+                                ? 'Failed to load orders'
+                                : 'Failed to load order'
+                    }
                 }
             ]
         });

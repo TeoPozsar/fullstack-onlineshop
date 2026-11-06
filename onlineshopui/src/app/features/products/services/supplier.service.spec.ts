@@ -8,6 +8,7 @@ import { MOCK_SUPPLIERS } from '../../../core/mocks/data/products.mock';
 import { MOCK_ENVIRONMENT_CONFIG } from '../../../core/mocks/data/environment.mock';
 import { TranslocoService } from '@jsverse/transloco';
 import { vi } from 'vitest';
+import { translocoTestingImports } from '../../../core/testing/transloco-testing';
 
 describe('SupplierService', () => {
     let service: SupplierService;
@@ -15,6 +16,7 @@ describe('SupplierService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
+            imports: translocoTestingImports,
             providers: [
                 SupplierService,
                 provideHttpClient(),

@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
+import { translocoTestingImports } from '../../../../../core/testing/transloco-testing';
 import { signal } from '@angular/core';
 import { ProductCatalogPageComponent } from './product-catalog-page.component';
 import { ProductService } from '../../../services/product.service';
@@ -59,7 +60,7 @@ describe('ProductCatalogPageComponent', () => {
         };
 
         TestBed.configureTestingModule({
-            imports: [ProductCatalogPageComponent],
+            imports: [ProductCatalogPageComponent, ...translocoTestingImports],
             providers: [
                 { provide: ProductService, useValue: productServiceMock },
                 { provide: CartService, useValue: cartServiceMock },
@@ -72,6 +73,8 @@ describe('ProductCatalogPageComponent', () => {
                         config: { reRenderOnLangChange: false },
                         langChanges$: of('en'),
                         getActiveLang: vi.fn().mockReturnValue('en'),
+                        setActiveLang: vi.fn(),
+                        _loadDependencies: vi.fn(),
                         selectTranslate: vi.fn().mockReturnValue(of('')),
                         translate: vi.fn().mockImplementation(
                             (key: string, params?: { name?: string }) => {

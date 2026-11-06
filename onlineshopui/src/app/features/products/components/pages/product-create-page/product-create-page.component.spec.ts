@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
+import { translocoTestingImports } from '../../../../../core/testing/transloco-testing';
 import { signal } from '@angular/core';
 import { ProductCreatePageComponent } from './product-create-page.component';
 import { ProductService } from '../../../services/product.service';
@@ -21,7 +22,10 @@ describe('ProductCreatePageComponent', () => {
     const translocoServiceMock = {
         langChanges$: of('en'),
         getActiveLang: vi.fn().mockReturnValue('en'),
-        translate: vi.fn().mockImplementation((key: string) => key)
+        translate: vi.fn().mockImplementation((key: string) => key),
+        setActiveLang: vi.fn(),
+        _loadDependencies: vi.fn(),
+        config: { reRenderOnLangChange: true }
     };
     let component: ProductCreatePageComponent;
     let fixture: ComponentFixture<ProductCreatePageComponent>;
@@ -72,7 +76,7 @@ describe('ProductCreatePageComponent', () => {
         };
 
         TestBed.configureTestingModule({
-            imports: [ProductCreatePageComponent],
+            imports: [ProductCreatePageComponent, ...translocoTestingImports],
             providers: [
                 { provide: ProductService, useValue: productServiceMock },
                 { provide: SupplierService, useValue: supplierServiceMock },

@@ -14,6 +14,7 @@ import { signal } from '@angular/core';
 import { ValidationMessages } from '../../../../../core/types/providers/validation-messages';
 import { createDefaultValidationMessages } from '../../../../../core/config/constants/validation.constants';
 import { TranslocoService } from '@jsverse/transloco';
+import { translocoTestingImports } from '../../../../../core/testing/transloco-testing';
 
 const checkoutAddress = {
     country: 'USA',
@@ -26,7 +27,10 @@ describe('CartOverviewPageComponent', () => {
     const translocoServiceMock = {
         langChanges$: of('en'),
         getActiveLang: vi.fn().mockReturnValue('en'),
-        translate: vi.fn().mockImplementation((key: string) => key)
+        translate: vi.fn().mockImplementation((key: string) => key),
+        setActiveLang: vi.fn(),
+        _loadDependencies: vi.fn(),
+        config: { reRenderOnLangChange: true }
     };
     let component: CartOverviewPageComponent;
     let fixture: ComponentFixture<CartOverviewPageComponent>;
@@ -87,7 +91,7 @@ describe('CartOverviewPageComponent', () => {
         };
 
         TestBed.configureTestingModule({
-            imports: [CartOverviewPageComponent],
+            imports: [CartOverviewPageComponent, ...translocoTestingImports],
             providers: [
                 { provide: CartService, useValue: cartServiceMock },
                 { provide: ProductService, useValue: productServiceMock },
