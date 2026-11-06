@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ProductCreatePageComponent } from './product-create-page.component';
 import { ProductService } from '../../../services/product.service';
+import { SupplierService } from '../../../services/supplier.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import {
     MOCK_CATEGORIES,
@@ -20,13 +21,15 @@ describe('ProductCreatePageComponent', () => {
     let fixture: ComponentFixture<ProductCreatePageComponent>;
     let productServiceMock: {
         categories: ReturnType<typeof signal>;
+        loading: ReturnType<typeof signal>;
+        loadCategories: ReturnType<typeof vi.fn>;
+        create: ReturnType<typeof vi.fn>;
+    };
+    let supplierServiceMock: {
         suppliers: ReturnType<typeof signal>;
         loading: ReturnType<typeof signal>;
-        supplierLoading: ReturnType<typeof signal>;
-        supplierError: ReturnType<typeof signal>;
-        loadCategories: ReturnType<typeof vi.fn>;
-        loadSuppliers: ReturnType<typeof vi.fn>;
-        create: ReturnType<typeof vi.fn>;
+        error: ReturnType<typeof signal>;
+        loadAll: ReturnType<typeof vi.fn>;
     };
     let routerMock: {
         navigate: ReturnType<typeof vi.fn>;
@@ -42,13 +45,15 @@ describe('ProductCreatePageComponent', () => {
         consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
         productServiceMock = {
             categories: signal([...MOCK_CATEGORIES]),
+            loading: signal(false),
+            loadCategories: vi.fn().mockReturnValue(of(MOCK_CATEGORIES)),
+            create: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0]))
+        };
+        supplierServiceMock = {
             suppliers: signal([...MOCK_SUPPLIERS]),
             loading: signal(false),
-            supplierLoading: signal(false),
-            supplierError: signal(null),
-            loadCategories: vi.fn().mockReturnValue(of(MOCK_CATEGORIES)),
-            loadSuppliers: vi.fn().mockReturnValue(of(MOCK_SUPPLIERS)),
-            create: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0]))
+            error: signal(null),
+            loadAll: vi.fn().mockReturnValue(of(MOCK_SUPPLIERS))
         };
 
         routerMock = {
@@ -64,6 +69,7 @@ describe('ProductCreatePageComponent', () => {
             imports: [ProductCreatePageComponent],
             providers: [
                 { provide: ProductService, useValue: productServiceMock },
+                { provide: SupplierService, useValue: supplierServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
                 { provide: ValidationMessages, useValue: DefaultValidationMessages }
@@ -99,7 +105,7 @@ describe('ProductCreatePageComponent', () => {
 
             // Verify
             expect(productServiceMock.loadCategories).toHaveBeenCalled();
-            expect(productServiceMock.loadSuppliers).toHaveBeenCalled();
+            expect(supplierServiceMock.loadAll).toHaveBeenCalled();
         });
 
         it('should initialize with empty form', () => {
@@ -124,15 +130,15 @@ describe('ProductCreatePageComponent', () => {
 
     describe('supplier loading', () => {
         it('should display supplier errors and allow retrying', () => {
-            productServiceMock.supplierError.set('Failed to load suppliers');
+            supplierServiceMock.error.set('Failed to load suppliers');
             fixture.detectChanges();
 
             expect(fixture.nativeElement.textContent).toContain('Failed to load suppliers');
 
-            productServiceMock.loadSuppliers.mockClear();
+            supplierServiceMock.loadAll.mockClear();
             component.retrySuppliers();
 
-            expect(productServiceMock.loadSuppliers).toHaveBeenCalledOnce();
+            expect(supplierServiceMock.loadAll).toHaveBeenCalledOnce();
         });
     });
 

@@ -4,7 +4,6 @@ import { Observable, tap, finalize, catchError, of, map } from 'rxjs';
 import {
     ProductDto,
     ProductCategoryDto,
-    SupplierDto,
     CreateProductRequest,
     UpdateProductRequest
 } from '../../../core/types/dtos/product.dto';
@@ -18,25 +17,18 @@ export class ProductService {
     private readonly environmentConfig = inject(EnvironmentConfig);
     private readonly productsUrl = `${this.environmentConfig.apiUrl}/products`;
     private readonly categoriesUrl = `${this.environmentConfig.apiUrl}/products/categories`;
-    private readonly suppliersUrl = `${this.environmentConfig.apiUrl}/suppliers`;
 
     private readonly _products = signal<ProductDto[]>([]);
     private readonly _selectedProduct = signal<ProductDto | null>(null);
     private readonly _categories = signal<ProductCategoryDto[]>([]);
-    private readonly _suppliers = signal<SupplierDto[]>([]);
     private readonly _loading = signal(false);
     private readonly _error = signal<string | null>(null);
-    private readonly _supplierLoading = signal(false);
-    private readonly _supplierError = signal<string | null>(null);
 
     readonly products = this._products.asReadonly();
     readonly selectedProduct = this._selectedProduct.asReadonly();
     readonly categories = this._categories.asReadonly();
-    readonly suppliers = this._suppliers.asReadonly();
     readonly loading = this._loading.asReadonly();
     readonly error = this._error.asReadonly();
-    readonly supplierLoading = this._supplierLoading.asReadonly();
-    readonly supplierError = this._supplierError.asReadonly();
 
     loadAll(): Observable<void> {
         this._loading.set(true);
@@ -83,22 +75,6 @@ export class ProductService {
                 return of([]);
             }),
             finalize(() => this._loading.set(false)),
-            map(() => undefined)
-        );
-    }
-
-    loadSuppliers(): Observable<void> {
-        this._supplierLoading.set(true);
-        this._supplierError.set(null);
-
-        return this.http.get<SupplierDto[]>(this.suppliersUrl).pipe(
-            tap(suppliers => this._suppliers.set(suppliers)),
-            tap(() => this._supplierError.set(null)),
-            catchError(() => {
-                this._supplierError.set('Failed to load suppliers');
-                return of([]);
-            }),
-            finalize(() => this._supplierLoading.set(false)),
             map(() => undefined)
         );
     }

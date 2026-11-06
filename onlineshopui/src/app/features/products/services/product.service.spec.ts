@@ -60,11 +60,8 @@ describe('ProductService', () => {
             expect(service.products()).toEqual([]);
             expect(service.selectedProduct()).toBeNull();
             expect(service.categories()).toEqual([]);
-            expect(service.suppliers()).toEqual([]);
             expect(service.loading()).toBe(false);
             expect(service.error()).toBeNull();
-            expect(service.supplierLoading()).toBe(false);
-            expect(service.supplierError()).toBeNull();
         });
     });
 
@@ -290,68 +287,6 @@ describe('ProductService', () => {
             expect(service.categories()).toEqual([]);
             expect(service.error()).toBe('Failed to load categories');
             expect(service.loading()).toBe(false);
-        });
-    });
-
-    describe('loadSuppliers()', () => {
-        it('should load suppliers successfully', () => {
-            service.loadSuppliers().pipe(take(1)).subscribe();
-
-            const req = httpMock.expectOne(`${MOCK_ENVIRONMENT_CONFIG.apiUrl}/suppliers`);
-            expect(req.request.method).toBe('GET');
-            req.flush(MOCK_SUPPLIERS);
-
-            expect(service.suppliers()).toEqual(MOCK_SUPPLIERS);
-            expect(service.supplierError()).toBeNull();
-            expect(service.supplierLoading()).toBe(false);
-        });
-
-        it('should report an error when suppliers fail to load', () => {
-            service.loadSuppliers().pipe(take(1)).subscribe();
-
-            const req = httpMock.expectOne(`${MOCK_ENVIRONMENT_CONFIG.apiUrl}/suppliers`);
-            req.flush('Error', { status: 500, statusText: 'Server Error' });
-
-            expect(service.suppliers()).toEqual([]);
-            expect(service.supplierError()).toBe('Failed to load suppliers');
-            expect(service.error()).toBeNull();
-            expect(service.supplierLoading()).toBe(false);
-        });
-
-        it('should preserve supplier errors when categories load successfully', () => {
-            service.loadCategories().pipe(take(1)).subscribe();
-            service.loadSuppliers().pipe(take(1)).subscribe();
-
-            const categoryRequest = httpMock.expectOne(
-                `${MOCK_ENVIRONMENT_CONFIG.apiUrl}/products/categories`
-            );
-            const supplierRequest = httpMock.expectOne(
-                `${MOCK_ENVIRONMENT_CONFIG.apiUrl}/suppliers`
-            );
-
-            supplierRequest.flush('Error', { status: 500, statusText: 'Server Error' });
-            categoryRequest.flush(MOCK_CATEGORIES);
-
-            expect(service.supplierError()).toBe('Failed to load suppliers');
-            expect(service.error()).toBeNull();
-        });
-
-        it('should preserve category errors when suppliers load successfully', () => {
-            service.loadCategories().pipe(take(1)).subscribe();
-            service.loadSuppliers().pipe(take(1)).subscribe();
-
-            const categoryRequest = httpMock.expectOne(
-                `${MOCK_ENVIRONMENT_CONFIG.apiUrl}/products/categories`
-            );
-            const supplierRequest = httpMock.expectOne(
-                `${MOCK_ENVIRONMENT_CONFIG.apiUrl}/suppliers`
-            );
-
-            categoryRequest.flush('Error', { status: 500, statusText: 'Server Error' });
-            supplierRequest.flush(MOCK_SUPPLIERS);
-
-            expect(service.error()).toBe('Failed to load categories');
-            expect(service.supplierError()).toBeNull();
         });
     });
 

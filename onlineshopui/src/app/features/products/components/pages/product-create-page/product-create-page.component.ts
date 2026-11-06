@@ -5,6 +5,7 @@ import { CardComponent } from '../../../../../clib/components/card/card.componen
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { ProductFormComponent } from '../../views/product-form/product-form.component';
 import { ProductService } from '../../../services/product.service';
+import { SupplierService } from '../../../services/supplier.service';
 import { createProductForm } from '../../../utils/product-form.utils';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
@@ -18,15 +19,16 @@ import { NotificationsService } from '../../../../../core/services/notifications
 })
 export class ProductCreatePageComponent implements OnInit {
     private readonly productService = inject(ProductService);
+    private readonly supplierService = inject(SupplierService);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
 
     readonly form = createProductForm();
     readonly categories = this.productService.categories;
-    readonly suppliers = this.productService.suppliers;
+    readonly suppliers = this.supplierService.suppliers;
     readonly loading = this.productService.loading;
-    readonly supplierLoading = this.productService.supplierLoading;
-    readonly supplierError = this.productService.supplierError;
+    readonly supplierLoading = this.supplierService.loading;
+    readonly supplierError = this.supplierService.error;
     readonly isSubmitting = signal(false);
 
     constructor() {
@@ -42,7 +44,7 @@ export class ProductCreatePageComponent implements OnInit {
 
     ngOnInit(): void {
         this.productService.loadCategories().pipe(take(1)).subscribe();
-        this.productService.loadSuppliers().pipe(take(1)).subscribe();
+        this.supplierService.loadAll().pipe(take(1)).subscribe();
     }
 
     onSubmit(): void {
@@ -95,6 +97,6 @@ export class ProductCreatePageComponent implements OnInit {
     }
 
     retrySuppliers(): void {
-        this.productService.loadSuppliers().pipe(take(1)).subscribe();
+        this.supplierService.loadAll().pipe(take(1)).subscribe();
     }
 }
