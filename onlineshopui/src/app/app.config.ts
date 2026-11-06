@@ -22,6 +22,7 @@ import { getMockInterceptors } from './core/providers/mock-api.provider';
 import { AuthService } from './features/auth/services/auth.service';
 import { AppIcons } from './core/config/constants/icons.constants';
 import { LucideAngularModule } from 'lucide-angular';
+import { provideAppTransloco } from './core/providers/transloco.provider';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -34,6 +35,7 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(
             withInterceptors([authTokenInterceptor, ...getMockInterceptors(environment.envType)])
         ),
+        provideAppTransloco(),
         importProvidersFrom(LucideAngularModule.pick(AppIcons)),
         provideRouter(routes, withEnabledBlockingInitialNavigation(), withComponentInputBinding()),
         provideValidationMessages(DefaultValidationMessages),
