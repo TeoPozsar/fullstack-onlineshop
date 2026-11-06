@@ -32,5 +32,31 @@
         "unknownUser": "Unbekannter Benutzer",
         "lightMode": "Heller Modus",
         "darkMode": "Dunkler Modus"
+    },
+    "auth": {
+        "fields": {
+            "email": "E-Mail",
+            "password": "Passwort",
+            "firstName": "Vorname",
+            "lastName": "Nachname"
+        },
+        "login": {
+            "title": "Anmelden",
+            "submitting": "Anmeldung läuft...",
+            "submit": "Anmelden",
+            "noAccount": "Noch kein Konto?",
+            "link": "Anmelden"
+        },
+        "register": {
+            "title": "Konto erstellen",
+            "submitting": "Konto wird erstellt...",
+            "submit": "Konto erstellen",
+            "hasAccount": "Bereits ein Konto?",
+            "link": "Registrieren"
+        },
+        "errors": {
+            "invalidCredentials": "Ungültiger Benutzername oder ungültiges Passwort.",
+            "registrationFailed": "Konto konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
+        }
     }
 }

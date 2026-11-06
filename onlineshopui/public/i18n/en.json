@@ -32,5 +32,31 @@
         "unknownUser": "Unknown user",
         "lightMode": "Light Mode",
         "darkMode": "Dark Mode"
+    },
+    "auth": {
+        "fields": {
+            "email": "Email",
+            "password": "Password",
+            "firstName": "First Name",
+            "lastName": "Last Name"
+        },
+        "login": {
+            "title": "Sign In",
+            "submitting": "Signing In...",
+            "submit": "Sign In",
+            "noAccount": "Don't have an account?",
+            "link": "Sign In"
+        },
+        "register": {
+            "title": "Create Account",
+            "submitting": "Creating Account...",
+            "submit": "Create Account",
+            "hasAccount": "Already have an account?",
+            "link": "Register"
+        },
+        "errors": {
+            "invalidCredentials": "Invalid username or password.",
+            "registrationFailed": "Unable to create account. Please try again."
+        }
     }
 }

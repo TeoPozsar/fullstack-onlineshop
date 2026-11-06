@@ -6,15 +6,17 @@ import { AuthService } from '../../services/auth.service';
 import { AppNavRoutes } from '../../../../core/config/constants/navigation.constants';
 import { createRegisterForm } from '../../utils/register-form.utils';
 import { ErrorMessageComponent } from '../../../../clib/components/error-message/error-message.component';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
     selector: 'app-register-page',
-    imports: [ReactiveFormsModule, RouterLink, ErrorMessageComponent],
+    imports: [ReactiveFormsModule, RouterLink, ErrorMessageComponent, TranslocoPipe],
     templateUrl: './register-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterPageComponent {
     private readonly authService = inject(AuthService);
+    private readonly translocoService = inject(TranslocoService);
     readonly isSubmitting = signal(false);
     readonly errorMessage = signal<string | null>(null);
 
@@ -43,7 +45,7 @@ export class RegisterPageComponent {
                 },
                 error: () => {
                     this.isSubmitting.set(false);
-                    this.errorMessage.set('Unable to create account. Please try again.');
+                    this.errorMessage.set(this.translocoService.translate('auth.errors.registrationFailed'));
                 }
             });
     }
