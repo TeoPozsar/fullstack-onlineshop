@@ -9,11 +9,12 @@ import { SupplierService } from '../../../services/supplier.service';
 import { createProductForm } from '../../../utils/product-form.utils';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
     selector: 'app-product-update-page',
     standalone: true,
-    imports: [CardComponent, SpinnerComponent, ProductFormComponent],
+    imports: [CardComponent, SpinnerComponent, ProductFormComponent, TranslocoPipe],
     templateUrl: './product-update-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -23,6 +24,7 @@ export class ProductUpdatePageComponent implements OnInit {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
+    private readonly translocoService = inject(TranslocoService);
 
     readonly form = createProductForm();
     readonly product = this.productService.selectedProduct;
@@ -103,8 +105,10 @@ export class ProductUpdatePageComponent implements OnInit {
                 next: () => {
                     this.isSubmitting.set(false);
                     this.notificationsService.notifySuccess({
-                        title: 'Product updated',
-                        message: 'Changes have been saved.'
+                        title: this.translocoService.translate('products.notifications.updated'),
+                        message: this.translocoService.translate(
+                            'products.notifications.updatedMessage'
+                        )
                     });
                     this.router.navigate([
                         `/${AppNavRoutes.Products.root}/${AppNavRoutes.Products.features.overview}`
@@ -113,8 +117,10 @@ export class ProductUpdatePageComponent implements OnInit {
                 error: err => {
                     console.error('Failed to update product:', err);
                     this.notificationsService.notifyError({
-                        title: 'Update failed',
-                        message: 'Unable to save changes.'
+                        title: this.translocoService.translate('products.notifications.updateFailed'),
+                        message: this.translocoService.translate(
+                            'products.notifications.updateFailedMessage'
+                        )
                     });
                     this.isSubmitting.set(false);
                 }

@@ -11,6 +11,8 @@ import {
 } from '../../../core/mocks/data/products.mock';
 import { MOCK_ENVIRONMENT_CONFIG } from '../../../core/mocks/data/environment.mock';
 import { ProductDto } from '../../../core/types/dtos/product.dto';
+import { TranslocoService } from '@jsverse/transloco';
+import { vi } from 'vitest';
 
 describe('ProductService', () => {
     let service: ProductService;
@@ -25,6 +27,19 @@ describe('ProductService', () => {
                 {
                     provide: EnvironmentConfig,
                     useValue: MOCK_ENVIRONMENT_CONFIG
+                },
+                {
+                    provide: TranslocoService,
+                    useValue: {
+                        translate: vi.fn().mockImplementation((key: string) => {
+                            const messages: Record<string, string> = {
+                                'products.errors.loadAll': 'Failed to load products',
+                                'products.errors.loadOne': 'Failed to load product',
+                                'products.errors.categories': 'Failed to load categories'
+                            };
+                            return messages[key] ?? key;
+                        })
+                    }
                 }
             ]
         });

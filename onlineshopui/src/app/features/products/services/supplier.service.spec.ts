@@ -6,6 +6,8 @@ import { SupplierService } from './supplier.service';
 import { EnvironmentConfig } from '../../../core/types/providers/environment-config';
 import { MOCK_SUPPLIERS } from '../../../core/mocks/data/products.mock';
 import { MOCK_ENVIRONMENT_CONFIG } from '../../../core/mocks/data/environment.mock';
+import { TranslocoService } from '@jsverse/transloco';
+import { vi } from 'vitest';
 
 describe('SupplierService', () => {
     let service: SupplierService;
@@ -20,6 +22,12 @@ describe('SupplierService', () => {
                 {
                     provide: EnvironmentConfig,
                     useValue: MOCK_ENVIRONMENT_CONFIG
+                },
+                {
+                    provide: TranslocoService,
+                    useValue: {
+                        translate: vi.fn().mockReturnValue('Failed to load suppliers')
+                    }
                 }
             ]
         });

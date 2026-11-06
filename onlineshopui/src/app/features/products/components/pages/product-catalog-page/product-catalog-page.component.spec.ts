@@ -11,6 +11,8 @@ import { MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { EnvironmentConfig } from '../../../../../core/types/providers/environment-config';
 import { MOCK_ENVIRONMENT_CONFIG } from '../../../../../core/mocks/data/environment.mock';
+import { TranslocoService } from '@jsverse/transloco';
+import { LanguageService } from '../../../../../core/services/language.service';
 
 describe('ProductCatalogPageComponent', () => {
     let component: ProductCatalogPageComponent;
@@ -63,7 +65,28 @@ describe('ProductCatalogPageComponent', () => {
                 { provide: CartService, useValue: cartServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
-                { provide: EnvironmentConfig, useValue: MOCK_ENVIRONMENT_CONFIG }
+                { provide: EnvironmentConfig, useValue: MOCK_ENVIRONMENT_CONFIG },
+                {
+                    provide: TranslocoService,
+                    useValue: {
+                        config: { reRenderOnLangChange: false },
+                        langChanges$: of('en'),
+                        getActiveLang: vi.fn().mockReturnValue('en'),
+                        selectTranslate: vi.fn().mockReturnValue(of('')),
+                        translate: vi.fn().mockImplementation(
+                            (key: string, params?: { name?: string }) => {
+                                if (key === 'products.notifications.addedTitle') {
+                                    return 'Added to cart';
+                                }
+                                if (key === 'products.notifications.addedMessage') {
+                                    return `${params?.name ?? 'Product'} was added to your cart.`;
+                                }
+                                return key;
+                            }
+                        )
+                    }
+                },
+                { provide: LanguageService, useValue: { activeLanguage: signal<'en' | 'de'>('en') } }
             ]
         });
 

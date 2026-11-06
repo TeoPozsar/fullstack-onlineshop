@@ -1,5 +1,6 @@
 import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
     ProductCategoryDto,
     SupplierDto
@@ -10,7 +11,7 @@ import { ErrorMessageComponent } from '../../../../../clib/components/error-mess
 @Component({
     selector: 'app-product-form',
     standalone: true,
-    imports: [ReactiveFormsModule, ErrorMessageComponent],
+    imports: [ReactiveFormsModule, ErrorMessageComponent, TranslocoPipe],
     templateUrl: './product-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -58,5 +58,79 @@
             "invalidCredentials": "Invalid username or password.",
             "registrationFailed": "Unable to create account. Please try again."
         }
+    },
+    "products": {
+        "name": "Product",
+        "title": "Products",
+        "subtitle": "Browse our collection of products",
+        "empty": "No products available",
+        "fields": {
+            "name": "Product Name",
+            "description": "Description",
+            "price": "Price ($)",
+            "weight": "Weight (g)",
+            "category": "Category",
+            "supplier": "Supplier",
+            "imageUrl": "Image URL",
+            "quantity": "Quantity",
+            "quantitySelector": "Quantity selector",
+            "totalPrice": "Total Price:"
+        },
+        "placeholders": {
+            "name": "Enter product name",
+            "description": "Enter product description",
+            "category": "Select a category",
+            "supplier": "Select a supplier",
+            "imageUrl": "https://example.com/image.jpg"
+        },
+        "actions": {
+            "view": "View",
+            "addToCart": "Add to Cart",
+            "edit": "Edit",
+            "delete": "Delete",
+            "cancel": "Cancel",
+            "back": "Back to Products",
+            "tryAgain": "Try Again",
+            "addNew": "Add New Product",
+            "create": "Create Product",
+            "update": "Update Product"
+        },
+        "delete": {
+            "title": "Delete Product",
+            "confirmation": "Are you sure you want to delete this product? This action cannot be undone."
+        },
+        "create": {
+            "title": "Create New Product",
+            "subtitle": "Add a new product to your catalog"
+        },
+        "update": {
+            "title": "Edit Product",
+            "subtitle": "Update product information"
+        },
+        "suppliers": {
+            "loading": "Loading suppliers...",
+            "retry": "Retry supplier loading",
+            "empty": "No suppliers are available."
+        },
+        "errors": {
+            "loadAll": "Failed to load products",
+            "loadOne": "Failed to load product",
+            "categories": "Failed to load categories",
+            "suppliers": "Failed to load suppliers"
+        },
+        "notifications": {
+            "addedTitle": "Added to cart",
+            "addedMessage": "{{name}} was added to your cart.",
+            "deleteFailed": "Delete failed",
+            "deleteUnexpected": "An unexpected error occurred while deleting the product.",
+            "created": "Product created",
+            "createdMessage": "Your new product is now available.",
+            "createFailed": "Create failed",
+            "createFailedMessage": "Unable to create the product.",
+            "updated": "Product updated",
+            "updatedMessage": "Changes have been saved.",
+            "updateFailed": "Update failed",
+            "updateFailedMessage": "Unable to save changes."
+        }
     }
 }

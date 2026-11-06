@@ -58,5 +58,79 @@
             "invalidCredentials": "Ungültiger Benutzername oder ungültiges Passwort.",
             "registrationFailed": "Konto konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
         }
+    },
+    "products": {
+        "name": "Produkt",
+        "title": "Produkte",
+        "subtitle": "Durchsuchen Sie unsere Produktauswahl",
+        "empty": "Keine Produkte verfügbar",
+        "fields": {
+            "name": "Produktname",
+            "description": "Beschreibung",
+            "price": "Preis ($)",
+            "weight": "Gewicht (g)",
+            "category": "Kategorie",
+            "supplier": "Lieferant",
+            "imageUrl": "Bild-URL",
+            "quantity": "Menge",
+            "quantitySelector": "Mengenauswahl",
+            "totalPrice": "Gesamtpreis:"
+        },
+        "placeholders": {
+            "name": "Produktname eingeben",
+            "description": "Produktbeschreibung eingeben",
+            "category": "Kategorie auswählen",
+            "supplier": "Lieferanten auswählen",
+            "imageUrl": "https://example.com/image.jpg"
+        },
+        "actions": {
+            "view": "Ansehen",
+            "addToCart": "In den Warenkorb",
+            "edit": "Bearbeiten",
+            "delete": "Löschen",
+            "cancel": "Abbrechen",
+            "back": "Zurück zu den Produkten",
+            "tryAgain": "Erneut versuchen",
+            "addNew": "Neues Produkt hinzufügen",
+            "create": "Produkt erstellen",
+            "update": "Produkt aktualisieren"
+        },
+        "delete": {
+            "title": "Produkt löschen",
+            "confirmation": "Möchten Sie dieses Produkt wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+        },
+        "create": {
+            "title": "Neues Produkt erstellen",
+            "subtitle": "Ein neues Produkt zu Ihrem Katalog hinzufügen"
+        },
+        "update": {
+            "title": "Produkt bearbeiten",
+            "subtitle": "Produktinformationen aktualisieren"
+        },
+        "suppliers": {
+            "loading": "Lieferanten werden geladen...",
+            "retry": "Lieferanten erneut laden",
+            "empty": "Keine Lieferanten verfügbar."
+        },
+        "errors": {
+            "loadAll": "Produkte konnten nicht geladen werden",
+            "loadOne": "Produkt konnte nicht geladen werden",
+            "categories": "Kategorien konnten nicht geladen werden",
+            "suppliers": "Lieferanten konnten nicht geladen werden"
+        },
+        "notifications": {
+            "addedTitle": "In den Warenkorb gelegt",
+            "addedMessage": "{{name}} wurde Ihrem Warenkorb hinzugefügt.",
+            "deleteFailed": "Löschen fehlgeschlagen",
+            "deleteUnexpected": "Beim Löschen des Produkts ist ein unerwarteter Fehler aufgetreten.",
+            "created": "Produkt erstellt",
+            "createdMessage": "Ihr neues Produkt ist jetzt verfügbar.",
+            "createFailed": "Erstellen fehlgeschlagen",
+            "createFailedMessage": "Das Produkt konnte nicht erstellt werden.",
+            "updated": "Produkt aktualisiert",
+            "updatedMessage": "Änderungen wurden gespeichert.",
+            "updateFailed": "Aktualisieren fehlgeschlagen",
+            "updateFailedMessage": "Änderungen konnten nicht gespeichert werden."
+        }
     }
 }

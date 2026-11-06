@@ -9,11 +9,12 @@ import { SupplierService } from '../../../services/supplier.service';
 import { createProductForm } from '../../../utils/product-form.utils';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
     selector: 'app-product-create-page',
     standalone: true,
-    imports: [CardComponent, SpinnerComponent, ProductFormComponent],
+    imports: [CardComponent, SpinnerComponent, ProductFormComponent, TranslocoPipe],
     templateUrl: './product-create-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -22,6 +23,7 @@ export class ProductCreatePageComponent implements OnInit {
     private readonly supplierService = inject(SupplierService);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
+    private readonly translocoService = inject(TranslocoService);
 
     readonly form = createProductForm();
     readonly categories = this.productService.categories;
@@ -72,8 +74,10 @@ export class ProductCreatePageComponent implements OnInit {
                 next: () => {
                     this.isSubmitting.set(false);
                     this.notificationsService.notifySuccess({
-                        title: 'Product created',
-                        message: 'Your new product is now available.'
+                        title: this.translocoService.translate('products.notifications.created'),
+                        message: this.translocoService.translate(
+                            'products.notifications.createdMessage'
+                        )
                     });
                     this.router.navigate([
                         `/${AppNavRoutes.Products.root}/${AppNavRoutes.Products.features.overview}`
@@ -82,8 +86,10 @@ export class ProductCreatePageComponent implements OnInit {
                 error: err => {
                     console.error('Failed to create product:', err);
                     this.notificationsService.notifyError({
-                        title: 'Create failed',
-                        message: 'Unable to create the product.'
+                        title: this.translocoService.translate('products.notifications.createFailed'),
+                        message: this.translocoService.translate(
+                            'products.notifications.createFailedMessage'
+                        )
                     });
                     this.isSubmitting.set(false);
                 }

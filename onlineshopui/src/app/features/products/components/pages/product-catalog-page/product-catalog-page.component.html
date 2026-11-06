@@ -3,15 +3,17 @@
         <!-- Header -->
         <div class="flex flex-wrap items-end justify-between gap-4 mb-10">
             <div>
-                <h1 class="text-3xl font-semibold text-text tracking-tight">Products</h1>
-                <p class="mt-2 text-text-muted max-w-xl">Browse our collection of products</p>
+                <h1 class="text-3xl font-semibold text-text tracking-tight">
+                    {{ 'products.title' | transloco }}
+                </h1>
+                <p class="mt-2 text-text-muted max-w-xl">{{ 'products.subtitle' | transloco }}</p>
             </div>
             <a
                 *appHasRole="UserRole.ADMIN"
                 [routerLink]="['/' + 'products' + '/' + 'create']"
                 class="px-4 py-2 bg-primary hover:bg-accent text-primary-foreground rounded-full transition-colors"
             >
-                Add New Product
+                {{ 'products.actions.addNew' | transloco }}
             </a>
         </div>
 
@@ -30,7 +32,7 @@
                     (click)="retry()"
                     class="px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white rounded-md transition-colors"
                 >
-                    Try Again
+                    {{ 'products.actions.tryAgain' | transloco }}
                 </button>
             </div>
         }
@@ -38,7 +40,7 @@
         <!-- Empty State -->
         @if (!loading() && !error() && products().length === 0) {
             <div class="text-center py-12">
-                <p class="text-text-muted text-lg">No products available</p>
+                <p class="text-text-muted text-lg">{{ 'products.empty' | transloco }}</p>
             </div>
         }
 
@@ -60,16 +62,16 @@
         <!-- Delete Confirmation Modal -->
         @if (showDeleteModal()) {
             <app-modal
-                title="Delete Product"
+                [title]="'products.delete.title' | transloco"
                 [isOpen]="showDeleteModal()"
-                confirmText="Delete"
-                cancelText="Cancel"
+                [confirmText]="'products.actions.delete' | transloco"
+                [cancelText]="'products.actions.cancel' | transloco"
                 [isProcessing]="isDeleting()"
                 (confirmed)="confirmDelete()"
                 (cancelled)="cancelDelete()"
             >
                 <p class="text-text">
-                    Are you sure you want to delete this product? This action cannot be undone.
+                    {{ 'products.delete.confirmation' | transloco }}
                 </p>
             </app-modal>
         }

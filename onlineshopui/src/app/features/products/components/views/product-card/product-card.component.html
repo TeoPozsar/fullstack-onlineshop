@@ -29,7 +29,7 @@
             <!-- Price and Weight -->
             <div class="flex items-baseline justify-between mb-4">
                 <span class="text-2xl font-semibold text-text">
-                    ${{ product().price.toFixed(2) }}
+                    {{ formattedPrice() }}
                 </span>
                 <span class="text-sm text-text-muted uppercase tracking-wide">
                     {{ product().weight }}g
@@ -42,28 +42,28 @@
                     (click)="onViewDetails()"
                     class="flex-1 px-3 py-1.5 text-sm bg-surface border border-border text-text rounded-full hover:bg-surface-2 transition-colors"
                 >
-                    View
+                    {{ 'products.actions.view' | transloco }}
                 </button>
                 <button
                     *appHasRole="UserRole.CUSTOMER"
                     (click)="onAddToCart()"
                     class="flex-1 px-3 py-1.5 text-sm bg-primary hover:bg-accent text-primary-foreground rounded-full transition-colors"
                 >
-                    Add to Cart
+                    {{ 'products.actions.addToCart' | transloco }}
                 </button>
                 <button
                     *appHasRole="UserRole.ADMIN"
                     (click)="onEdit()"
                     class="flex-1 px-3 py-1.5 text-sm bg-surface-2 hover:bg-surface border border-border text-text rounded-full transition-colors"
                 >
-                    Edit
+                    {{ 'products.actions.edit' | transloco }}
                 </button>
                 <button
                     *appHasRole="UserRole.ADMIN"
                     (click)="onDelete()"
                     class="flex-1 px-3 py-1.5 text-sm bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full transition-colors"
                 >
-                    Delete
+                    {{ 'products.actions.delete' | transloco }}
                 </button>
             </div>
         </div>

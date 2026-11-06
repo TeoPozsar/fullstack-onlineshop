@@ -2,8 +2,8 @@
     <div class="container mx-auto px-4 max-w-3xl">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-text">Edit Product</h1>
-            <p class="mt-2 text-text-muted">Update product information</p>
+            <h1 class="text-3xl font-bold text-text">{{ 'products.update.title' | transloco }}</h1>
+            <p class="mt-2 text-text-muted">{{ 'products.update.subtitle' | transloco }}</p>
         </div>
 
         <!-- Loading State -->
@@ -27,7 +27,9 @@
         }
 
         @if (supplierLoading() && suppliers().length === 0) {
-            <p class="mb-4 text-text-muted" role="status">Loading suppliers...</p>
+            <p class="mb-4 text-text-muted" role="status">
+                {{ 'products.suppliers.loading' | transloco }}
+            </p>
         }
 
         @if (supplierError() && !supplierLoading()) {
@@ -41,13 +43,15 @@
                     (click)="retrySuppliers()"
                     class="px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white rounded-md transition-colors"
                 >
-                    Retry supplier loading
+                    {{ 'products.suppliers.retry' | transloco }}
                 </button>
             </div>
         }
 
         @if (!supplierLoading() && !supplierError() && suppliers().length === 0) {
-            <p class="mb-4 text-text-muted" role="status">No suppliers are available.</p>
+            <p class="mb-4 text-text-muted" role="status">
+                {{ 'products.suppliers.empty' | transloco }}
+            </p>
         }
 
         <!-- Form -->
@@ -58,7 +62,7 @@
                     [categories]="categories()"
                     [suppliers]="suppliers()"
                     [isSubmitting]="isSubmitting()"
-                    [submitLabel]="'Update Product'"
+                    [submitLabel]="'products.actions.update' | transloco"
                     (formSubmit)="onSubmit()"
                     (cancelled)="onCancel()"
                 />

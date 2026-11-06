@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { Observable, tap, finalize, catchError, of, map } from 'rxjs';
 import { SupplierDto } from '../../../core/types/dtos/product.dto';
 import { EnvironmentConfig } from '../../../core/types/providers/environment-config';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
     providedIn: 'root'
@@ -10,6 +11,7 @@ import { EnvironmentConfig } from '../../../core/types/providers/environment-con
 export class SupplierService {
     private readonly http = inject(HttpClient);
     private readonly environmentConfig = inject(EnvironmentConfig);
+    private readonly translocoService = inject(TranslocoService);
     private readonly suppliersUrl = `${this.environmentConfig.apiUrl}/suppliers`;
 
     private readonly _suppliers = signal<SupplierDto[]>([]);
@@ -28,7 +30,7 @@ export class SupplierService {
             tap(suppliers => this._suppliers.set(suppliers)),
             tap(() => this._error.set(null)),
             catchError(() => {
-                this._error.set('Failed to load suppliers');
+                this._error.set(this.translocoService.translate('products.errors.suppliers'));
                 return of([]);
             }),
             finalize(() => this._loading.set(false)),

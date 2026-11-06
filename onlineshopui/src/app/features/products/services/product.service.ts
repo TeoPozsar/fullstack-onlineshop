@@ -8,6 +8,7 @@ import {
     UpdateProductRequest
 } from '../../../core/types/dtos/product.dto';
 import { EnvironmentConfig } from '../../../core/types/providers/environment-config';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
     providedIn: 'root'
@@ -15,6 +16,7 @@ import { EnvironmentConfig } from '../../../core/types/providers/environment-con
 export class ProductService {
     private readonly http = inject(HttpClient);
     private readonly environmentConfig = inject(EnvironmentConfig);
+    private readonly translocoService = inject(TranslocoService);
     private readonly productsUrl = `${this.environmentConfig.apiUrl}/products`;
     private readonly categoriesUrl = `${this.environmentConfig.apiUrl}/products/categories`;
 
@@ -38,7 +40,7 @@ export class ProductService {
             tap(products => this._products.set(products)),
             tap(() => this._error.set(null)),
             catchError(() => {
-                this._error.set('Failed to load products');
+                this._error.set(this.translocoService.translate('products.errors.loadAll'));
                 return of([]);
             }),
             finalize(() => this._loading.set(false)),
@@ -54,7 +56,7 @@ export class ProductService {
             tap(product => this._selectedProduct.set(product)),
             tap(() => this._error.set(null)),
             catchError(() => {
-                this._error.set('Failed to load product');
+                this._error.set(this.translocoService.translate('products.errors.loadOne'));
                 this._selectedProduct.set(null);
                 return of(null);
             }),
@@ -71,7 +73,7 @@ export class ProductService {
             tap(categories => this._categories.set(categories)),
             tap(() => this._error.set(null)),
             catchError(() => {
-                this._error.set('Failed to load categories');
+                this._error.set(this.translocoService.translate('products.errors.categories'));
                 return of([]);
             }),
             finalize(() => this._loading.set(false)),
