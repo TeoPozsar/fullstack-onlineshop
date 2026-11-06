@@ -22,9 +22,14 @@ describe('ProductUpdatePageComponent', () => {
     const translocoServiceMock = {
         langChanges$: of('en'),
         getActiveLang: vi.fn().mockReturnValue('en'),
-        translate: vi.fn().mockImplementation((key: string) => key),
+        translate: vi.fn().mockImplementation((key: string) => ({
+            'products.notifications.updated': 'Product updated',
+            'products.notifications.updatedMessage': 'The product was updated successfully.',
+            'products.notifications.updateFailed': 'Update failed',
+            'products.notifications.updateFailedMessage': 'The product could not be updated.'
+        })[key] ?? key),
         setActiveLang: vi.fn(),
-        _loadDependencies: vi.fn(),
+        _loadDependencies: vi.fn().mockReturnValue(of({})),
         config: { reRenderOnLangChange: true }
     };
     let component: ProductUpdatePageComponent;
@@ -60,7 +65,9 @@ describe('ProductUpdatePageComponent', () => {
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args) => {
+            void args;
+        });
         productServiceMock = {
             selectedProduct: signal(MOCK_PRODUCTS[0]),
             categories: signal([...MOCK_CATEGORIES]),
@@ -215,7 +222,7 @@ describe('ProductUpdatePageComponent', () => {
             });
             expect(notificationsServiceMock.notifySuccess).toHaveBeenCalledWith({
                 title: 'Product updated',
-                message: 'Changes have been saved.'
+                message: 'The product was updated successfully.'
             });
             expect(routerMock.navigate).toHaveBeenCalledWith([
                 `/${AppNavRoutes.Products.root}/${AppNavRoutes.Products.features.overview}`
@@ -248,7 +255,7 @@ describe('ProductUpdatePageComponent', () => {
             // Verify
             expect(notificationsServiceMock.notifyError).toHaveBeenCalledWith({
                 title: 'Update failed',
-                message: 'Unable to save changes.'
+                message: 'The product could not be updated.'
             });
             expect(routerMock.navigate).not.toHaveBeenCalled();
         });

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { take } from 'rxjs';
@@ -19,7 +20,15 @@ export class LoginPageComponent {
     private readonly router = inject(Router);
     private readonly translocoService = inject(TranslocoService);
     readonly isSubmitting = signal(false);
-    readonly errorMessage = signal<string | null>(null);
+    private readonly errorKey = signal<string | null>(null);
+    private readonly languageChanges = toSignal(this.translocoService.langChanges$, {
+        initialValue: this.translocoService.getActiveLang()
+    });
+    readonly errorMessage = computed(() => {
+        this.languageChanges();
+        const key = this.errorKey();
+        return key ? this.translocoService.translate(key) : null;
+    });
 
     readonly form = createLoginForm();
 
@@ -32,7 +41,7 @@ export class LoginPageComponent {
     ];
 
     onSubmit() {
-        this.errorMessage.set(null);
+        this.errorKey.set(null);
 
         if (this.form.invalid || this.isSubmitting()) {
             this.form.markAllAsTouched();
@@ -53,7 +62,7 @@ export class LoginPageComponent {
                 },
                 error: () => {
                     this.isSubmitting.set(false);
-                    this.errorMessage.set(this.translocoService.translate('auth.errors.invalidCredentials'));
+                    this.errorKey.set('auth.errors.invalidCredentials');
                 }
             });
     }

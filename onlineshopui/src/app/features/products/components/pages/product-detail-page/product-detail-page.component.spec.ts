@@ -77,6 +77,8 @@ describe('ProductDetailPageComponent', () => {
                         config: { reRenderOnLangChange: false },
                         langChanges$: of('en'),
                         getActiveLang: vi.fn().mockReturnValue('en'),
+                        setActiveLang: vi.fn(),
+                        _loadDependencies: vi.fn().mockReturnValue(of({})),
                         selectTranslate: vi.fn().mockReturnValue(of('')),
                         translate: vi.fn().mockImplementation((key: string, params?: { name?: string }) =>
                             key === 'products.notifications.addedTitle'

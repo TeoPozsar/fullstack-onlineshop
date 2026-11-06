@@ -22,9 +22,14 @@ describe('ProductCreatePageComponent', () => {
     const translocoServiceMock = {
         langChanges$: of('en'),
         getActiveLang: vi.fn().mockReturnValue('en'),
-        translate: vi.fn().mockImplementation((key: string) => key),
+        translate: vi.fn().mockImplementation((key: string) => ({
+            'products.notifications.created': 'Product created',
+            'products.notifications.createdMessage': 'The product was created successfully.',
+            'products.notifications.createFailed': 'Create failed',
+            'products.notifications.createFailedMessage': 'The product could not be created.'
+        })[key] ?? key),
         setActiveLang: vi.fn(),
-        _loadDependencies: vi.fn(),
+        _loadDependencies: vi.fn().mockReturnValue(of({})),
         config: { reRenderOnLangChange: true }
     };
     let component: ProductCreatePageComponent;
@@ -52,7 +57,9 @@ describe('ProductCreatePageComponent', () => {
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args) => {
+            void args;
+        });
         productServiceMock = {
             categories: signal([...MOCK_CATEGORIES]),
             loading: signal(false),
@@ -193,7 +200,7 @@ describe('ProductCreatePageComponent', () => {
             );
             expect(notificationsServiceMock.notifySuccess).toHaveBeenCalledWith({
                 title: 'Product created',
-                message: 'Your new product is now available.'
+                message: 'The product was created successfully.'
             });
             expect(routerMock.navigate).toHaveBeenCalledWith([
                 `/${AppNavRoutes.Products.root}/${AppNavRoutes.Products.features.overview}`
@@ -220,7 +227,7 @@ describe('ProductCreatePageComponent', () => {
             // Verify
             expect(notificationsServiceMock.notifyError).toHaveBeenCalledWith({
                 title: 'Create failed',
-                message: 'Unable to create the product.'
+                message: 'The product could not be created.'
             });
             expect(routerMock.navigate).not.toHaveBeenCalled();
         });

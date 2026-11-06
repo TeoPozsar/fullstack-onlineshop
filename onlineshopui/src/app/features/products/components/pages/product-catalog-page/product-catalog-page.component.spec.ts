@@ -33,12 +33,15 @@ describe('ProductCatalogPageComponent', () => {
     };
     let notificationsServiceMock: {
         notifySuccess: ReturnType<typeof vi.fn>;
+        notifyError: ReturnType<typeof vi.fn>;
     };
     let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args) => {
+            void args;
+        });
         productServiceMock = {
             products: signal([...MOCK_PRODUCTS]),
             loading: signal(false),
@@ -56,7 +59,8 @@ describe('ProductCatalogPageComponent', () => {
         };
 
         notificationsServiceMock = {
-            notifySuccess: vi.fn()
+            notifySuccess: vi.fn(),
+            notifyError: vi.fn()
         };
 
         TestBed.configureTestingModule({
@@ -74,7 +78,7 @@ describe('ProductCatalogPageComponent', () => {
                         langChanges$: of('en'),
                         getActiveLang: vi.fn().mockReturnValue('en'),
                         setActiveLang: vi.fn(),
-                        _loadDependencies: vi.fn(),
+                        _loadDependencies: vi.fn().mockReturnValue(of({})),
                         selectTranslate: vi.fn().mockReturnValue(of('')),
                         translate: vi.fn().mockImplementation(
                             (key: string, params?: { name?: string }) => {
@@ -83,6 +87,9 @@ describe('ProductCatalogPageComponent', () => {
                                 }
                                 if (key === 'products.notifications.addedMessage') {
                                     return `${params?.name ?? 'Product'} was added to your cart.`;
+                                }
+                                if (key === 'products.name') {
+                                    return 'Product';
                                 }
                                 return key;
                             }
