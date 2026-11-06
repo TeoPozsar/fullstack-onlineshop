@@ -1,0 +1,95 @@
+<div class="relative">
+    <button
+        #trigger
+        type="button"
+        class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-text hover:bg-surface-2 transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+        aria-haspopup="dialog"
+        [attr.aria-expanded]="isOpen()"
+        [attr.aria-controls]="panelId"
+        (click)="toggleMenu()"
+        (keydown.enter)="onTriggerKeydown($event)"
+        (keydown.space)="onTriggerKeydown($event)"
+    >
+        <span aria-hidden="true">Aa</span>
+        <span>Accessibility</span>
+    </button>
+
+    @if (isOpen()) {
+        <section
+            [id]="panelId"
+            class="absolute right-0 top-full z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] rounded-xl border border-border bg-surface p-4 text-text shadow-card"
+            role="dialog"
+            [attr.aria-labelledby]="titleId"
+        >
+            <div class="mb-4 flex items-start justify-between gap-4">
+                <h2 [id]="titleId" class="text-lg font-semibold">
+                    Accessibility settings
+                </h2>
+                <button
+                    type="button"
+                    class="rounded-md px-2 py-1 text-text-muted hover:bg-surface-2 hover:text-text focus:outline-none focus:ring-2 focus:ring-ring"
+                    aria-label="Close accessibility settings"
+                    (click)="closeMenu()"
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <fieldset class="space-y-2">
+                <legend class="mb-2 font-medium">Font size</legend>
+                @for (fontSize of fontSizeOptions; track fontSize) {
+                    <label class="flex items-center gap-3 rounded-md px-2 py-2 hover:bg-surface-2">
+                        <input
+                            #firstControl
+                            type="radio"
+                            name="accessibility-font-size"
+                            [value]="fontSize"
+                            [checked]="themeService.accessibilitySettings().fontSize === fontSize"
+                            [attr.aria-label]="fontSize + ' font size'"
+                            (change)="setFontSize(fontSize)"
+                        />
+                        <span>{{ fontSize | titlecase }}</span>
+                    </label>
+                }
+            </fieldset>
+
+            <div class="mt-4 space-y-3 border-t border-border pt-4">
+                <label class="flex items-center justify-between gap-3">
+                    <span>High contrast</span>
+                    <input
+                        type="checkbox"
+                        aria-label="High contrast"
+                        [checked]="themeService.accessibilitySettings().highContrast"
+                        (change)="toggleHighContrast()"
+                    />
+                </label>
+                <label class="flex items-center justify-between gap-3">
+                    <span>Reduced motion</span>
+                    <input
+                        type="checkbox"
+                        aria-label="Reduced motion"
+                        [checked]="themeService.accessibilitySettings().reducedMotion"
+                        (change)="toggleReducedMotion()"
+                    />
+                </label>
+            </div>
+
+            <div class="mt-4 flex justify-end gap-2 border-t border-border pt-4">
+                <button
+                    type="button"
+                    class="rounded-md border border-border px-3 py-2 text-text hover:bg-surface-2 focus:outline-none focus:ring-2 focus:ring-ring"
+                    (click)="resetSettings()"
+                >
+                    Reset to defaults
+                </button>
+                <button
+                    type="button"
+                    class="rounded-md bg-primary px-3 py-2 font-medium text-primary-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                    (click)="closeMenu()"
+                >
+                    Close
+                </button>
+            </div>
+        </section>
+    }
+</div>

@@ -34,6 +34,36 @@
     --color-destructive-foreground: #120f10;
 }
 
+.high-contrast {
+    --color-primary: #7f1d1d;
+    --color-primary-foreground: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-2: #f3f4f6;
+    --color-border: #1f2937;
+    --color-text: #111827;
+    --color-text-muted: #374151;
+    --color-accent: #991b1b;
+    --color-accent-foreground: #ffffff;
+    --color-ring: #1d4ed8;
+    --color-destructive: #b91c1c;
+    --color-destructive-foreground: #ffffff;
+}
+
+.theme-dark.high-contrast {
+    --color-primary: #fca5a5;
+    --color-primary-foreground: #111827;
+    --color-surface: #000000;
+    --color-surface-2: #111827;
+    --color-border: #ffffff;
+    --color-text: #ffffff;
+    --color-text-muted: #e5e7eb;
+    --color-accent: #fecaca;
+    --color-accent-foreground: #111827;
+    --color-ring: #93c5fd;
+    --color-destructive: #fca5a5;
+    --color-destructive-foreground: #111827;
+}
+
 @theme {
     --color-primary: var(--color-primary);
     --color-primary-foreground: var(--color-primary-foreground);
@@ -54,6 +84,22 @@
     html,
     body {
         height: 100%;
+    }
+
+    html.font-size-small {
+        font-size: 87.5%;
+    }
+
+    html.font-size-medium {
+        font-size: 100%;
+    }
+
+    html.font-size-large {
+        font-size: 112.5%;
+    }
+
+    html.font-size-extra-large {
+        font-size: 125%;
     }
 
     body {
@@ -89,11 +135,28 @@
             var(--color-surface);
     }
 
+    .high-contrast body,
+    .theme-dark.high-contrast body {
+        background: var(--color-surface);
+    }
+
     .theme-dark {
         --shadow-card:
             0 18px 44px -28px rgba(6, 6, 6, 0.9), 0 2px 12px -6px rgba(6, 6, 6, 0.7),
             0 0 0 1px rgba(255, 240, 241, 0.06);
     }
+}
+
+html.reduced-motion,
+html.reduced-motion *,
+html.reduced-motion *::before,
+html.reduced-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
 }
 
 ::-webkit-scrollbar {

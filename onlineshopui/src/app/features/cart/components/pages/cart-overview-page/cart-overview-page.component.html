@@ -12,11 +12,11 @@
         }
 
         @if (error() && !loading()) {
-            <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-                <p class="text-red-800 mb-4">{{ error() }}</p>
+            <div class="bg-surface-2 border border-destructive rounded-lg p-6 text-center">
+                <p class="text-destructive mb-4">{{ error() }}</p>
                 <button
                     (click)="retry()"
-                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                    class="px-4 py-2 bg-destructive hover:opacity-90 text-destructive-foreground rounded-md transition-colors"
                 >
                     Try Again
                 </button>
