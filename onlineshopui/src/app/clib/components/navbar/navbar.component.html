@@ -34,6 +34,8 @@
 
             <!-- Right Section: Theme Toggle + Auth -->
             <div class="hidden md:flex items-center gap-4">
+                <app-accessibility-menu />
+
                 <!-- Theme Toggle -->
                 <button
                     (click)="toggleTheme()"
@@ -128,6 +130,10 @@
                             <span>Dark Mode</span>
                         }
                     </button>
+                </div>
+
+                <div class="flex justify-end border-t border-border pt-2 mt-2">
+                    <app-accessibility-menu />
                 </div>
 
                 <div class="border-t border-border pt-2 mt-2">

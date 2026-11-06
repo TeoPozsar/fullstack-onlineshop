@@ -12,10 +12,11 @@ import { AuthService } from '../../../features/auth/services/auth.service';
 import { ThemeService } from '../../services/theme.service';
 import { AppNavRoutes } from '../../../core/config/constants/navigation.constants';
 import { IconComponent } from '../icon/icon.component';
+import { AccessibilityMenuComponent } from '../accessibility-menu/accessibility-menu.component';
 
 @Component({
     selector: 'app-navbar',
-    imports: [RouterLink, RouterLinkActive, IconComponent],
+    imports: [RouterLink, RouterLinkActive, IconComponent, AccessibilityMenuComponent],
     templateUrl: './navbar.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
