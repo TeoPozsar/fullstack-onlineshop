@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import msg.onlineshopapi.exception.ProductInOrderException;
 import msg.onlineshopapi.exception.ResourceNotFoundException;
 import msg.onlineshopapi.model.Product;
+import msg.onlineshopapi.model.Supplier;
 import msg.onlineshopapi.repository.OrderDetailRepository;
 import msg.onlineshopapi.repository.ProductRepository;
+import msg.onlineshopapi.repository.SupplierRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final SupplierRepository supplierRepository;
 
     public List<Product> findAll() {
         return productRepository.findAll();
@@ -28,6 +31,7 @@ public class ProductService {
     }
 
     public Product save(Product product) {
+        product.setSupplier(requireSupplier(product));
         return productRepository.save(product);
     }
 
@@ -39,8 +43,15 @@ public class ProductService {
         existing.setPrice(product.getPrice());
         existing.setWeight(product.getWeight());
         existing.setCategory(product.getCategory());
+        existing.setSupplier(requireSupplier(product));
         existing.setImageUrl(product.getImageUrl());
         return productRepository.save(existing);
+    }
+
+    private Supplier requireSupplier(Product product) {
+        UUID supplierId = product.getSupplier().getId();
+        return supplierRepository.findById(supplierId)
+                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with id: " + supplierId));
     }
 
     public void deleteById(UUID id) {

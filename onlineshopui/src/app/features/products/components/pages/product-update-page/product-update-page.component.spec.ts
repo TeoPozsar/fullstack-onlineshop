@@ -5,8 +5,13 @@ import { vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ProductUpdatePageComponent } from './product-update-page.component';
 import { ProductService } from '../../../services/product.service';
+import { SupplierService } from '../../../services/supplier.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
-import { MOCK_CATEGORIES, MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
+import {
+    MOCK_CATEGORIES,
+    MOCK_PRODUCTS,
+    MOCK_SUPPLIERS
+} from '../../../../../core/mocks/data/products.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { ValidationMessages } from '../../../../../core/types/providers/validation-messages';
 import { DefaultValidationMessages } from '../../../../../core/config/constants/validation.constants';
@@ -22,6 +27,12 @@ describe('ProductUpdatePageComponent', () => {
         loadById: ReturnType<typeof vi.fn>;
         loadCategories: ReturnType<typeof vi.fn>;
         update: ReturnType<typeof vi.fn>;
+    };
+    let supplierServiceMock: {
+        suppliers: ReturnType<typeof signal>;
+        loading: ReturnType<typeof signal>;
+        error: ReturnType<typeof signal>;
+        loadAll: ReturnType<typeof vi.fn>;
     };
     let routerMock: {
         navigate: ReturnType<typeof vi.fn>;
@@ -49,6 +60,12 @@ describe('ProductUpdatePageComponent', () => {
             loadCategories: vi.fn().mockReturnValue(of(MOCK_CATEGORIES)),
             update: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0]))
         };
+        supplierServiceMock = {
+            suppliers: signal([...MOCK_SUPPLIERS]),
+            loading: signal(false),
+            error: signal(null),
+            loadAll: vi.fn().mockReturnValue(of(MOCK_SUPPLIERS))
+        };
 
         routerMock = {
             navigate: vi.fn()
@@ -69,6 +86,7 @@ describe('ProductUpdatePageComponent', () => {
             imports: [ProductUpdatePageComponent],
             providers: [
                 { provide: ProductService, useValue: productServiceMock },
+                { provide: SupplierService, useValue: supplierServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: ActivatedRoute, useValue: activatedRouteMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
@@ -106,6 +124,7 @@ describe('ProductUpdatePageComponent', () => {
             // Verify
             expect(productServiceMock.loadById).toHaveBeenCalledWith('prod-1');
             expect(productServiceMock.loadCategories).toHaveBeenCalled();
+            expect(supplierServiceMock.loadAll).toHaveBeenCalled();
         });
 
         it('should navigate to products overview when no id provided', () => {
@@ -135,7 +154,8 @@ describe('ProductUpdatePageComponent', () => {
                 price: MOCK_PRODUCTS[0].price,
                 weight: MOCK_PRODUCTS[0].weight,
                 imageUrl: MOCK_PRODUCTS[0].imageUrl,
-                categoryId: MOCK_PRODUCTS[0].category.id
+                categoryId: MOCK_PRODUCTS[0].category.id,
+                supplierId: MOCK_PRODUCTS[0].supplier.id
             });
         });
     });
@@ -162,7 +182,8 @@ describe('ProductUpdatePageComponent', () => {
             // Prepare
             component.form.patchValue({
                 name: 'Updated Product',
-                price: 199.99
+                price: 199.99,
+                supplierId: MOCK_SUPPLIERS[1].id
             });
 
             // Action
@@ -175,7 +196,8 @@ describe('ProductUpdatePageComponent', () => {
                 price: 199.99,
                 weight: MOCK_PRODUCTS[0].weight,
                 imageUrl: MOCK_PRODUCTS[0].imageUrl,
-                categoryId: MOCK_PRODUCTS[0].category.id
+                categoryId: MOCK_PRODUCTS[0].category.id,
+                supplierId: MOCK_SUPPLIERS[1].id
             });
             expect(notificationsServiceMock.notifySuccess).toHaveBeenCalledWith({
                 title: 'Product updated',
@@ -251,6 +273,7 @@ describe('ProductUpdatePageComponent', () => {
             component.ngOnInit();
             productServiceMock.loadById.mockClear();
             productServiceMock.loadCategories.mockClear();
+            supplierServiceMock.loadAll.mockClear();
 
             // Action
             component.retry();
@@ -258,6 +281,7 @@ describe('ProductUpdatePageComponent', () => {
             // Verify
             expect(productServiceMock.loadById).toHaveBeenCalledWith('prod-1');
             expect(productServiceMock.loadCategories).toHaveBeenCalled();
+            expect(supplierServiceMock.loadAll).toHaveBeenCalled();
         });
 
         it('should not reload when no product id', () => {
@@ -266,6 +290,7 @@ describe('ProductUpdatePageComponent', () => {
             component.ngOnInit();
             productServiceMock.loadById.mockClear();
             productServiceMock.loadCategories.mockClear();
+            supplierServiceMock.loadAll.mockClear();
 
             // Action
             component.retry();
@@ -273,6 +298,21 @@ describe('ProductUpdatePageComponent', () => {
             // Verify
             expect(productServiceMock.loadById).not.toHaveBeenCalled();
             expect(productServiceMock.loadCategories).not.toHaveBeenCalled();
+            expect(supplierServiceMock.loadAll).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('supplier loading', () => {
+        it('should display supplier errors and allow retrying', () => {
+            supplierServiceMock.error.set('Failed to load suppliers');
+            fixture.detectChanges();
+
+            expect(fixture.nativeElement.textContent).toContain('Failed to load suppliers');
+
+            supplierServiceMock.loadAll.mockClear();
+            component.retrySuppliers();
+
+            expect(supplierServiceMock.loadAll).toHaveBeenCalledOnce();
         });
     });
 });

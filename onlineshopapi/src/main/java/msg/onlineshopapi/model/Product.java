@@ -35,6 +35,10 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private ProductCategory category;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "supplier_id", nullable = false)
+    private Supplier supplier;
+
     @Column(name = "image_url")
     private String imageUrl;
 

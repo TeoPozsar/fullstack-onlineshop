@@ -4,7 +4,11 @@ import { provideHttpClientTesting, HttpTestingController } from '@angular/common
 import { take } from 'rxjs';
 import { ProductService } from './product.service';
 import { EnvironmentConfig } from '../../../core/types/providers/environment-config';
-import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '../../../core/mocks/data/products.mock';
+import {
+    MOCK_PRODUCTS,
+    MOCK_CATEGORIES,
+    MOCK_SUPPLIERS
+} from '../../../core/mocks/data/products.mock';
 import { MOCK_ENVIRONMENT_CONFIG } from '../../../core/mocks/data/environment.mock';
 import { ProductDto } from '../../../core/types/dtos/product.dto';
 
@@ -295,7 +299,8 @@ describe('ProductService', () => {
                 price: 99.99,
                 weight: 1.5,
                 imageUrl: 'http://test.com/image.jpg',
-                categoryId: 'cat-1'
+                categoryId: 'cat-1',
+                supplierId: MOCK_SUPPLIERS[0].id
             };
 
             const createdProduct: ProductDto = {
@@ -305,7 +310,8 @@ describe('ProductService', () => {
                 price: newProductData.price,
                 weight: newProductData.weight,
                 imageUrl: newProductData.imageUrl,
-                category: MOCK_CATEGORIES[0]
+                category: MOCK_CATEGORIES[0],
+                supplier: MOCK_SUPPLIERS[0]
             };
 
             // Pre-populate with existing products
@@ -338,7 +344,8 @@ describe('ProductService', () => {
                 price: 50.0,
                 weight: 0.5,
                 imageUrl: 'http://example.com/image.jpg',
-                categoryId: 'cat-2'
+                categoryId: 'cat-2',
+                supplierId: MOCK_SUPPLIERS[1].id
             };
 
             // Action
@@ -351,7 +358,8 @@ describe('ProductService', () => {
             req.flush({
                 id: 'prod-test',
                 ...newProductData,
-                category: MOCK_CATEGORIES[1]
+                category: MOCK_CATEGORIES[1],
+                supplier: MOCK_SUPPLIERS[1]
             });
         });
 
@@ -363,7 +371,8 @@ describe('ProductService', () => {
                 price: 99.99,
                 weight: 1.5,
                 imageUrl: 'http://test.com/image.jpg',
-                categoryId: 'cat-1'
+                categoryId: 'cat-1',
+                supplierId: MOCK_SUPPLIERS[0].id
             };
 
             // Action
@@ -388,12 +397,15 @@ describe('ProductService', () => {
             const productId = 'prod-1';
             const updateData = {
                 name: 'Updated Product',
-                price: 199.99
+                price: 199.99,
+                supplierId: MOCK_SUPPLIERS[1].id
             };
 
             const updatedProduct: ProductDto = {
                 ...MOCK_PRODUCTS[0],
-                ...updateData
+                name: updateData.name,
+                price: updateData.price,
+                supplier: MOCK_SUPPLIERS[1]
             };
 
             // Pre-populate products
@@ -423,10 +435,11 @@ describe('ProductService', () => {
         it('should update selectedProduct when ID matches', () => {
             // Prepare
             const productId = 'prod-1';
-            const updateData = { name: 'Updated Product' };
+            const updateData = { name: 'Updated Product', supplierId: MOCK_SUPPLIERS[1].id };
             const updatedProduct: ProductDto = {
                 ...MOCK_PRODUCTS[0],
-                ...updateData
+                name: updateData.name,
+                supplier: MOCK_SUPPLIERS[1]
             };
 
             // Set selected product
@@ -465,7 +478,7 @@ describe('ProductService', () => {
             // Action
             // Update prod-2
             service
-                .update('prod-2', { name: 'Updated' })
+                .update('prod-2', { name: 'Updated', supplierId: MOCK_SUPPLIERS[1].id })
                 .pipe(take(1))
                 .subscribe(() => {
                     expect(service.selectedProduct()).toEqual(selectedBefore);
@@ -475,7 +488,8 @@ describe('ProductService', () => {
             const req = httpMock.expectOne(`${MOCK_ENVIRONMENT_CONFIG.apiUrl}/products/prod-2`);
             req.flush({
                 ...MOCK_PRODUCTS[1],
-                name: 'Updated'
+                name: 'Updated',
+                supplier: MOCK_SUPPLIERS[1]
             });
         });
 
@@ -485,7 +499,8 @@ describe('ProductService', () => {
             const updateData = {
                 name: 'Updated Name',
                 price: 250.0,
-                categoryId: 'cat-2'
+                categoryId: 'cat-2',
+                supplierId: MOCK_SUPPLIERS[1].id
             };
 
             // Action
@@ -499,7 +514,9 @@ describe('ProductService', () => {
             expect(req.request.body).toEqual(updateData);
             req.flush({
                 ...MOCK_PRODUCTS[0],
-                ...updateData
+                name: updateData.name,
+                price: updateData.price,
+                supplier: MOCK_SUPPLIERS[1]
             });
         });
     });
