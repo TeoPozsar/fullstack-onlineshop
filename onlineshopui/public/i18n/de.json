@@ -132,5 +132,38 @@
             "updateFailed": "Aktualisieren fehlgeschlagen",
             "updateFailedMessage": "Änderungen konnten nicht gespeichert werden."
         }
+    },
+    "cart": {
+        "title": "Ihr Warenkorb",
+        "subtitle": "Prüfen Sie die Artikel vor der Bestellung.",
+        "empty": "Ihr Warenkorb ist leer.",
+        "summary": {
+            "title": "Bestellübersicht",
+            "items": "Artikel",
+            "subtotal": "Zwischensumme"
+        },
+        "address": {
+            "title": "Lieferadresse",
+            "subtitle": "Geben Sie die Adresse für die Lieferung Ihrer Bestellung ein.",
+            "country": "Land",
+            "city": "Stadt",
+            "county": "Bundesland",
+            "street": "Straße und Hausnummer"
+        },
+        "actions": {
+            "remove": "Entfernen",
+            "decreaseQuantity": "Menge verringern",
+            "increaseQuantity": "Menge erhöhen",
+            "placeOrder": "Bestellung aufgeben",
+            "clear": "Warenkorb leeren",
+            "tryAgain": "Erneut versuchen",
+            "browseProducts": "Produkte durchsuchen"
+        },
+        "notifications": {
+            "orderPlaced": "Bestellung aufgegeben",
+            "orderPlacedMessage": "Ihre Bestellung wird bearbeitet.",
+            "orderFailed": "Bestellung fehlgeschlagen",
+            "orderFailedMessage": "Bitte versuchen Sie es gleich noch einmal."
+        }
     }
 }

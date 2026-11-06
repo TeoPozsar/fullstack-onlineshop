@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { CardComponent } from '../../../../../clib/components/card/card.component';
 
 @Component({
     selector: 'app-cart-summary',
-    imports: [CardComponent],
+    imports: [CardComponent, TranslocoPipe],
     templateUrl: './cart-summary.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })

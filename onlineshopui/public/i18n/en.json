@@ -132,5 +132,38 @@
             "updateFailed": "Update failed",
             "updateFailedMessage": "Unable to save changes."
         }
+    },
+    "cart": {
+        "title": "Your Cart",
+        "subtitle": "Review items before placing your order.",
+        "empty": "Your cart is empty.",
+        "summary": {
+            "title": "Order Summary",
+            "items": "Items",
+            "subtotal": "Subtotal"
+        },
+        "address": {
+            "title": "Shipping Address",
+            "subtitle": "Enter the address where your order should be delivered.",
+            "country": "Country",
+            "city": "City",
+            "county": "County",
+            "street": "Street Address"
+        },
+        "actions": {
+            "remove": "Remove",
+            "decreaseQuantity": "Decrease quantity",
+            "increaseQuantity": "Increase quantity",
+            "placeOrder": "Place Order",
+            "clear": "Clear Cart",
+            "tryAgain": "Try Again",
+            "browseProducts": "Browse Products"
+        },
+        "notifications": {
+            "orderPlaced": "Order placed",
+            "orderPlacedMessage": "Your order is being processed.",
+            "orderFailed": "Order failed",
+            "orderFailedMessage": "Please try again in a moment."
+        }
     }
 }

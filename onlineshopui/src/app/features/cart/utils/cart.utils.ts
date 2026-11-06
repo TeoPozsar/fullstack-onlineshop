@@ -2,6 +2,8 @@ import { ProductDto } from '../../../core/types/dtos/product.dto';
 import { CreateOrderDto } from '../../../core/types/dtos/order.dto';
 import { AddressDto } from '../../../core/types/dtos/location.dto';
 import { CartItem } from '../types/cart-item.type';
+import { AppLanguage } from '../../../core/config/constants/i18n.constants';
+import { formatCurrency } from '../../../core/utils/locale-format.utils';
 
 export function buildProductsById(products: ProductDto[]): Map<string, ProductDto> {
     return new Map(products.map(product => [product.id, product]));
@@ -9,7 +11,8 @@ export function buildProductsById(products: ProductDto[]): Map<string, ProductDt
 
 export function calculateCartSubtotal(
     items: CartItem[],
-    productsById: Map<string, ProductDto>
+    productsById: Map<string, ProductDto>,
+    lang: AppLanguage
 ): string {
     const total = items.reduce((sum, item) => {
         const product = productsById.get(item.productId);
@@ -17,11 +20,11 @@ export function calculateCartSubtotal(
         return sum + product.price * item.quantity;
     }, 0);
 
-    return total.toFixed(2);
+    return formatCurrency(total, lang);
 }
 
-export function calculateLineTotal(quantity: number, price: number): string {
-    return (quantity * price).toFixed(2);
+export function calculateLineTotal(quantity: number, price: number, lang: AppLanguage): string {
+    return formatCurrency(quantity * price, lang);
 }
 
 export function toCreateOrderDto(
