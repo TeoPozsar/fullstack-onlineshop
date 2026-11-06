@@ -64,6 +64,7 @@ Spring Security permits only registration, login, and OpenAPI/Swagger paths with
 
 - `SINGLE_LOCATION` is the configured default. It fulfils the complete order from one location with sufficient inventory.
 - `MOST_ABUNDANT` selects the highest-stock location for each requested product, so an order can ship from multiple locations.
+- `MULTI_LOCATION` selects the highest-stock location first for each product, then continues with the next-most-stocked locations until the requested quantity is covered.
 
 An unfulfillable order returns HTTP `422`. The global exception handler also returns `409` for duplicate resources and products referenced by orders, `404` for missing resources, `403` for access denial, and `401` for invalid credentials.
 
@@ -134,7 +135,7 @@ Flyway owns the PostgreSQL schema. The base migration is `onlineshopapi/src/main
 | `stocks` | Holds quantity per product and location; primary key: `product_id`, `location_id` |
 | `users` | Holds user identities and roles; email is unique |
 | `orders` | Holds user-owned orders and delivery-address data |
-| `order_details` | Holds ordered product quantities and shipping locations; primary key: `order_id`, `product_id` |
+| `order_details` | Holds ordered product quantities and shipping locations; primary key: `order_id`, `product_id`, `shipped_from_id`, allowing one product to ship from multiple locations in an order |
 
 The development Compose stack runs PostgreSQL 18, exposes container port `5432` on host port `5434`, and persists data in `shop-data-volume`. Production datasource settings come from environment variables: database host, port, name, username, and password.
 

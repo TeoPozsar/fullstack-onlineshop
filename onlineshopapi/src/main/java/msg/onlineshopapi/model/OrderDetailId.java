@@ -20,4 +20,7 @@ public class OrderDetailId implements Serializable {
 
     @Column(name = "product_id")
     private UUID productId;
+
+    @Column(name = "shipped_from_id")
+    private UUID locationId;
 }

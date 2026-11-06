@@ -12,6 +12,9 @@ import msg.onlineshopapi.model.Order;
 import msg.onlineshopapi.security.JwtService;
 import msg.onlineshopapi.service.OrderService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -189,6 +192,43 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value(containsString("address.streetAddress")));
+
+        verifyNoInteractions(orderMapper, orderService);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(ints = {0, -1})
+    @WithMockUser(username = "customer@test.com", roles = "CUSTOMER")
+    void create_returns400_whenQuantityIsNotPositive(Integer quantity) throws Exception {
+        OrderRequestDto request = orderRequest(address("USA", "Seattle", "King", "123 Pine Street"));
+        request.setItems(List.of(OrderItemRequestDto.builder()
+                .productId(productId)
+                .quantity(quantity)
+                .build()));
+
+        mockMvc.perform(post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .principal(() -> "customer@test.com"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value(containsString("quantity")));
+
+        verifyNoInteractions(orderMapper, orderService);
+    }
+
+    @Test
+    @WithMockUser(username = "customer@test.com", roles = "CUSTOMER")
+    void create_returns400_whenItemsAreEmpty() throws Exception {
+        OrderRequestDto request = orderRequest(address("USA", "Seattle", "King", "123 Pine Street"));
+        request.setItems(List.of());
+
+        mockMvc.perform(post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .principal(() -> "customer@test.com"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value(containsString("items")));
 
         verifyNoInteractions(orderMapper, orderService);
     }

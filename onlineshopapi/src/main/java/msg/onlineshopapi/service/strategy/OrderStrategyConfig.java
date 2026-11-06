@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class OrderStrategyConfig {
 
     public enum Strategy {
-        SINGLE_LOCATION, MOST_ABUNDANT
+        SINGLE_LOCATION, MOST_ABUNDANT, MULTI_LOCATION
     }
 
     @Value("${app.order.strategy}")
@@ -23,6 +23,9 @@ public class OrderStrategyConfig {
     public OrderStrategy orderStrategy() {
         if (orderStrategy == Strategy.MOST_ABUNDANT) {
             return new MostAbundantStrategy(stockRepository);
+        }
+        if (orderStrategy == Strategy.MULTI_LOCATION) {
+            return new MultiLocationStrategy(stockRepository);
         }
         return new SingleLocationStrategy(stockRepository);
     }

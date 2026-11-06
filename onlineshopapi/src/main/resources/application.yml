@@ -27,6 +27,7 @@ spring:
 
 app:
   order:
+    # Valid values: SINGLE_LOCATION, MOST_ABUNDANT, MULTI_LOCATION
     strategy: SINGLE_LOCATION
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS}

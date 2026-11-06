@@ -1,5 +1,6 @@
 package msg.onlineshopapi.unit.service;
 
+import msg.onlineshopapi.exception.OrderNotProcessableException;
 import msg.onlineshopapi.exception.ResourceNotFoundException;
 import msg.onlineshopapi.model.Location;
 import msg.onlineshopapi.model.Order;
@@ -103,6 +104,79 @@ class OrderServiceTest {
         assertThat(stock.getQuantity()).isEqualTo(7);
         verify(orderRepository, times(2)).save(order);
         verify(stockRepository).save(stock);
+    }
+
+    @Test
+    void createOrder_splitsQuantityAndDeductsEachContributingStockByAllocatedAmount() {
+        UUID productId = UUID.randomUUID();
+        Product product = product(productId);
+        Location firstLocation = location();
+        Location secondLocation = location();
+        Stock firstStock = stock(product, firstLocation, 7);
+        Stock secondStock = stock(product, secondLocation, 5);
+        Order order = order(UUID.randomUUID(), orderDetail(product, 10));
+
+        when(userRepository.findByEmail("customer@example.com"))
+                .thenReturn(Optional.of(User.builder().email("customer@example.com").build()));
+        when(orderStrategy.findStocks(anySet())).thenReturn(List.of(firstStock, secondStock));
+        when(orderRepository.save(order)).thenReturn(order);
+
+        orderService.createOrder(order, "customer@example.com");
+
+        assertThat(order.getOrderDetails()).extracting(OrderDetail::getQuantity)
+                .containsExactlyInAnyOrder(7, 3);
+        assertThat(order.getOrderDetails()).extracting(detail -> detail.getShippedFrom())
+                .containsExactlyInAnyOrder(firstLocation, secondLocation);
+        assertThat(firstStock.getQuantity()).isEqualTo(0);
+        assertThat(secondStock.getQuantity()).isEqualTo(2);
+        verify(stockRepository).save(firstStock);
+        verify(stockRepository).save(secondStock);
+    }
+
+    @Test
+    void createOrder_throwsBeforePersistence_whenStrategyReturnsInsufficientCandidates() {
+        UUID productId = UUID.randomUUID();
+        Product product = product(productId);
+        Stock stock = stock(product, location(), 2);
+        Order order = order(UUID.randomUUID(), orderDetail(product, 5));
+
+        when(userRepository.findByEmail("customer@example.com"))
+                .thenReturn(Optional.of(User.builder().email("customer@example.com").build()));
+        when(orderStrategy.findStocks(anySet())).thenReturn(List.of(stock));
+
+        assertThatThrownBy(() -> orderService.createOrder(order, "customer@example.com"))
+                .isInstanceOf(msg.onlineshopapi.exception.OrderNotProcessableException.class)
+                .hasMessageContaining(productId.toString());
+        verifyNoInteractions(orderRepository, stockRepository);
+    }
+
+    @Test
+    void createOrder_rejectsNonPositiveQuantityBeforeIteratingCandidates() {
+        UUID productId = UUID.randomUUID();
+        Product product = product(productId);
+        Order order = order(UUID.randomUUID(), orderDetail(product, 0));
+
+        when(userRepository.findByEmail("customer@example.com"))
+                .thenReturn(Optional.of(User.builder().email("customer@example.com").build()));
+
+        assertThatThrownBy(() -> orderService.createOrder(order, "customer@example.com"))
+                .isInstanceOf(OrderNotProcessableException.class)
+                .hasMessage("Order quantities must be greater than zero");
+        verifyNoInteractions(orderRepository, stockRepository, orderStrategy);
+    }
+
+    @Test
+    void createOrder_rejectsNonPositiveQuantityBeforeLookingUpCandidates() {
+        Product product = product(UUID.randomUUID());
+        Order order = order(UUID.randomUUID(), orderDetail(product, -1));
+
+        when(userRepository.findByEmail("customer@example.com"))
+                .thenReturn(Optional.of(User.builder().email("customer@example.com").build()));
+
+        assertThatThrownBy(() -> orderService.createOrder(order, "customer@example.com"))
+                .isInstanceOf(OrderNotProcessableException.class)
+                .hasMessage("Order quantities must be greater than zero");
+        verifyNoInteractions(orderRepository, stockRepository, orderStrategy);
     }
 
     @Test
