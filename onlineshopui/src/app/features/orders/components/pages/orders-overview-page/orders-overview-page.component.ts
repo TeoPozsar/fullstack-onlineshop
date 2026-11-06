@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
 import { OrdersService } from '../../../services/orders.service';
@@ -9,7 +10,7 @@ import { AppNavRoutes } from '../../../../../core/config/constants/navigation.co
 
 @Component({
     selector: 'app-orders-overview-page',
-    imports: [SpinnerComponent, OrderCardComponent],
+    imports: [SpinnerComponent, OrderCardComponent, TranslocoPipe],
     templateUrl: './orders-overview-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
