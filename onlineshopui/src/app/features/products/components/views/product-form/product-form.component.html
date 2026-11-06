@@ -2,14 +2,14 @@
     <!-- Product Name -->
     <div>
         <label for="name" class="block text-sm font-medium text-text-muted mb-1">
-            Product Name
+            {{ 'products.fields.name' | transloco }}
         </label>
         <input
             id="name"
             type="text"
             formControlName="name"
             class="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-surface text-text"
-            placeholder="Enter product name"
+            [placeholder]="'products.placeholders.name' | transloco"
         />
         <app-error-message [control]="form().get('name')" />
     </div>
@@ -17,14 +17,14 @@
     <!-- Product Description -->
     <div>
         <label for="description" class="block text-sm font-medium text-text-muted mb-1">
-            Description
+            {{ 'products.fields.description' | transloco }}
         </label>
         <textarea
             id="description"
             formControlName="description"
             rows="4"
             class="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-surface text-text"
-            placeholder="Enter product description"
+            [placeholder]="'products.placeholders.description' | transloco"
         ></textarea>
         <app-error-message [control]="form().get('description')" />
     </div>
@@ -34,7 +34,7 @@
         <!-- Price -->
         <div>
             <label for="price" class="block text-sm font-medium text-text-muted mb-1">
-                Price ($)
+                {{ 'products.fields.price' | transloco }}
             </label>
             <input
                 id="price"
@@ -51,7 +51,7 @@
         <!-- Weight -->
         <div>
             <label for="weight" class="block text-sm font-medium text-text-muted mb-1">
-                Weight (g)
+                {{ 'products.fields.weight' | transloco }}
             </label>
             <input
                 id="weight"
@@ -69,14 +69,14 @@
     <!-- Category -->
     <div>
         <label for="categoryId" class="block text-sm font-medium text-text-muted mb-1">
-            Category
+            {{ 'products.fields.category' | transloco }}
         </label>
         <select
             id="categoryId"
             formControlName="categoryId"
             class="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-surface text-text"
         >
-            <option value="">Select a category</option>
+            <option value="">{{ 'products.placeholders.category' | transloco }}</option>
             @for (category of categories(); track category.id) {
                 <option [value]="category.id">{{ category.name }}</option>
             }
@@ -84,17 +84,35 @@
         <app-error-message [control]="form().get('categoryId')" />
     </div>
 
+    <!-- Supplier -->
+    <div>
+        <label for="supplierId" class="block text-sm font-medium text-text-muted mb-1">
+            {{ 'products.fields.supplier' | transloco }}
+        </label>
+        <select
+            id="supplierId"
+            formControlName="supplierId"
+            class="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-surface text-text"
+        >
+            <option value="">{{ 'products.placeholders.supplier' | transloco }}</option>
+            @for (supplier of suppliers(); track supplier.id) {
+                <option [value]="supplier.id">{{ supplier.name }}</option>
+            }
+        </select>
+        <app-error-message [control]="form().get('supplierId')" />
+    </div>
+
     <!-- Image URL -->
     <div>
         <label for="imageUrl" class="block text-sm font-medium text-text-muted mb-1">
-            Image URL
+            {{ 'products.fields.imageUrl' | transloco }}
         </label>
         <input
             id="imageUrl"
             type="url"
             formControlName="imageUrl"
             class="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-surface text-text"
-            placeholder="https://example.com/image.jpg"
+            [placeholder]="'products.placeholders.imageUrl' | transloco"
         />
         <app-error-message [control]="form().get('imageUrl')" />
     </div>
@@ -107,7 +125,7 @@
             [disabled]="isSubmitting()"
             class="flex-1 px-4 py-2 border border-border text-text rounded-md hover:bg-surface-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-            Cancel
+            {{ 'products.actions.cancel' | transloco }}
         </button>
         <button
             type="button"

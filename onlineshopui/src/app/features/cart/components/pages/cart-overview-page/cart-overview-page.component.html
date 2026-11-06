@@ -2,8 +2,10 @@
     <div class="container mx-auto px-4 max-w-6xl">
         <div class="flex flex-wrap items-end justify-between gap-4 mb-10">
             <div>
-                <h1 class="text-3xl font-semibold text-text tracking-tight">Your Cart</h1>
-                <p class="mt-2 text-text-muted max-w-xl">Review items before placing your order.</p>
+                <h1 class="text-3xl font-semibold text-text tracking-tight">
+                    {{ 'cart.title' | transloco }}
+                </h1>
+                <p class="mt-2 text-text-muted max-w-xl">{{ 'cart.subtitle' | transloco }}</p>
             </div>
         </div>
 
@@ -18,19 +20,19 @@
                     (click)="retry()"
                     class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
                 >
-                    Try Again
+                    {{ 'cart.actions.tryAgain' | transloco }}
                 </button>
             </div>
         }
 
         @if (!loading() && !error() && cartItems().length === 0) {
             <div class="text-center py-16">
-                <p class="text-text-muted text-lg">Your cart is empty.</p>
+                <p class="text-text-muted text-lg">{{ 'cart.empty' | transloco }}</p>
                 <a
                     [routerLink]="productsLink"
                     class="inline-flex mt-4 px-4 py-2 rounded-full bg-primary hover:bg-accent text-primary-foreground transition-colors"
                 >
-                    Browse Products
+                    {{ 'cart.actions.browseProducts' | transloco }}
                 </a>
             </div>
         }
@@ -51,9 +53,11 @@
                     }
 
                     <section class="rounded-lg border border-border bg-surface p-6">
-                        <h2 class="text-lg font-semibold text-text">Shipping Address</h2>
+                        <h2 class="text-lg font-semibold text-text">
+                            {{ 'cart.address.title' | transloco }}
+                        </h2>
                         <p class="mt-1 mb-5 text-sm text-text-muted">
-                            Enter the address where your order should be delivered.
+                            {{ 'cart.address.subtitle' | transloco }}
                         </p>
 
                         <div
@@ -65,7 +69,7 @@
                                     for="country"
                                     class="block text-sm font-medium text-text-muted mb-1"
                                 >
-                                    Country
+                                    {{ 'cart.address.country' | transloco }}
                                 </label>
                                 <input
                                     id="country"
@@ -83,7 +87,7 @@
                                     for="city"
                                     class="block text-sm font-medium text-text-muted mb-1"
                                 >
-                                    City
+                                    {{ 'cart.address.city' | transloco }}
                                 </label>
                                 <input
                                     id="city"
@@ -101,7 +105,7 @@
                                     for="county"
                                     class="block text-sm font-medium text-text-muted mb-1"
                                 >
-                                    County
+                                    {{ 'cart.address.county' | transloco }}
                                 </label>
                                 <input
                                     id="county"
@@ -119,7 +123,7 @@
                                     for="streetAddress"
                                     class="block text-sm font-medium text-text-muted mb-1"
                                 >
-                                    Street Address
+                                    {{ 'cart.address.street' | transloco }}
                                 </label>
                                 <input
                                     id="streetAddress"

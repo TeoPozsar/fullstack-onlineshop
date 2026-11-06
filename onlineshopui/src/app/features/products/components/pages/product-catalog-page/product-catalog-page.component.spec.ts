@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
+import { translocoTestingImports } from '../../../../../core/testing/transloco-testing';
 import { signal } from '@angular/core';
 import { ProductCatalogPageComponent } from './product-catalog-page.component';
 import { ProductService } from '../../../services/product.service';
@@ -11,6 +12,8 @@ import { MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { EnvironmentConfig } from '../../../../../core/types/providers/environment-config';
 import { MOCK_ENVIRONMENT_CONFIG } from '../../../../../core/mocks/data/environment.mock';
+import { TranslocoService } from '@jsverse/transloco';
+import { LanguageService } from '../../../../../core/services/language.service';
 
 describe('ProductCatalogPageComponent', () => {
     let component: ProductCatalogPageComponent;
@@ -30,12 +33,15 @@ describe('ProductCatalogPageComponent', () => {
     };
     let notificationsServiceMock: {
         notifySuccess: ReturnType<typeof vi.fn>;
+        notifyError: ReturnType<typeof vi.fn>;
     };
     let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args) => {
+            void args;
+        });
         productServiceMock = {
             products: signal([...MOCK_PRODUCTS]),
             loading: signal(false),
@@ -53,17 +59,44 @@ describe('ProductCatalogPageComponent', () => {
         };
 
         notificationsServiceMock = {
-            notifySuccess: vi.fn()
+            notifySuccess: vi.fn(),
+            notifyError: vi.fn()
         };
 
         TestBed.configureTestingModule({
-            imports: [ProductCatalogPageComponent],
+            imports: [ProductCatalogPageComponent, ...translocoTestingImports],
             providers: [
                 { provide: ProductService, useValue: productServiceMock },
                 { provide: CartService, useValue: cartServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
-                { provide: EnvironmentConfig, useValue: MOCK_ENVIRONMENT_CONFIG }
+                { provide: EnvironmentConfig, useValue: MOCK_ENVIRONMENT_CONFIG },
+                {
+                    provide: TranslocoService,
+                    useValue: {
+                        config: { reRenderOnLangChange: false },
+                        langChanges$: of('en'),
+                        getActiveLang: vi.fn().mockReturnValue('en'),
+                        setActiveLang: vi.fn(),
+                        _loadDependencies: vi.fn().mockReturnValue(of({})),
+                        selectTranslate: vi.fn().mockReturnValue(of('')),
+                        translate: vi.fn().mockImplementation(
+                            (key: string, params?: { name?: string }) => {
+                                if (key === 'products.notifications.addedTitle') {
+                                    return 'Added to cart';
+                                }
+                                if (key === 'products.notifications.addedMessage') {
+                                    return `${params?.name ?? 'Product'} was added to your cart.`;
+                                }
+                                if (key === 'products.name') {
+                                    return 'Product';
+                                }
+                                return key;
+                            }
+                        )
+                    }
+                },
+                { provide: LanguageService, useValue: { activeLanguage: signal<'en' | 'de'>('en') } }
             ]
         });
 

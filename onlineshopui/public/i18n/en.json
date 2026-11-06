@@ -1,0 +1,191 @@
+{
+    "app": {
+        "name": "Online Shop"
+    },
+    "language": {
+        "switch": "Switch language",
+        "en": "EN",
+        "de": "DE"
+    },
+    "validation": {
+        "required": "This field is required",
+        "min": "Minimum value is {{min}}",
+        "max": "Maximum value is {{max}}",
+        "minlength": "Minimum length is {{requiredLength}} characters",
+        "maxlength": "Maximum length is {{requiredLength}} characters",
+        "email": "Please enter a valid email address",
+        "pattern": "Please enter a valid format",
+        "url": "Please enter a valid URL",
+        "unknown": "Validation error: {{key}}"
+    },
+    "common": {
+        "close": "Close",
+        "loading": "Loading..."
+    },
+    "nav": {
+        "products": "Products",
+        "orders": "Orders",
+        "cart": "Cart",
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "unknownUser": "Unknown user",
+        "lightMode": "Light Mode",
+        "darkMode": "Dark Mode"
+    },
+    "auth": {
+        "fields": {
+            "email": "Email",
+            "password": "Password",
+            "firstName": "First Name",
+            "lastName": "Last Name"
+        },
+        "login": {
+            "title": "Sign In",
+            "submitting": "Signing In...",
+            "submit": "Sign In",
+            "noAccount": "Don't have an account?",
+            "link": "Sign In"
+        },
+        "register": {
+            "title": "Create Account",
+            "submitting": "Creating Account...",
+            "submit": "Create Account",
+            "hasAccount": "Already have an account?",
+            "link": "Register"
+        },
+        "errors": {
+            "invalidCredentials": "Invalid username or password.",
+            "registrationFailed": "Unable to create account. Please try again."
+        }
+    },
+    "products": {
+        "name": "Product",
+        "title": "Products",
+        "subtitle": "Browse our collection of products",
+        "empty": "No products available",
+        "fields": {
+            "name": "Product Name",
+            "description": "Description",
+            "price": "Price ($)",
+            "weight": "Weight (g)",
+            "category": "Category",
+            "supplier": "Supplier",
+            "imageUrl": "Image URL",
+            "quantity": "Quantity",
+            "quantitySelector": "Quantity selector",
+            "totalPrice": "Total Price:"
+        },
+        "placeholders": {
+            "name": "Enter product name",
+            "description": "Enter product description",
+            "category": "Select a category",
+            "supplier": "Select a supplier",
+            "imageUrl": "https://example.com/image.jpg"
+        },
+        "actions": {
+            "view": "View",
+            "addToCart": "Add to Cart",
+            "edit": "Edit",
+            "delete": "Delete",
+            "cancel": "Cancel",
+            "back": "Back to Products",
+            "tryAgain": "Try Again",
+            "addNew": "Add New Product",
+            "create": "Create Product",
+            "update": "Update Product"
+        },
+        "delete": {
+            "title": "Delete Product",
+            "confirmation": "Are you sure you want to delete this product? This action cannot be undone."
+        },
+        "create": {
+            "title": "Create New Product",
+            "subtitle": "Add a new product to your catalog"
+        },
+        "update": {
+            "title": "Edit Product",
+            "subtitle": "Update product information"
+        },
+        "suppliers": {
+            "loading": "Loading suppliers...",
+            "retry": "Retry supplier loading",
+            "empty": "No suppliers are available."
+        },
+        "errors": {
+            "loadAll": "Failed to load products",
+            "loadOne": "Failed to load product",
+            "categories": "Failed to load categories",
+            "suppliers": "Failed to load suppliers"
+        },
+        "notifications": {
+            "addedTitle": "Added to cart",
+            "addedMessage": "{{name}} was added to your cart.",
+            "deleteFailed": "Delete failed",
+            "deleteUnexpected": "An unexpected error occurred while deleting the product.",
+            "created": "Product created",
+            "createdMessage": "Your new product is now available.",
+            "createFailed": "Create failed",
+            "createFailedMessage": "Unable to create the product.",
+            "updated": "Product updated",
+            "updatedMessage": "Changes have been saved.",
+            "updateFailed": "Update failed",
+            "updateFailedMessage": "Unable to save changes."
+        }
+    },
+    "cart": {
+        "title": "Your Cart",
+        "subtitle": "Review items before placing your order.",
+        "empty": "Your cart is empty.",
+        "summary": {
+            "title": "Order Summary",
+            "items": "Items",
+            "subtotal": "Subtotal"
+        },
+        "address": {
+            "title": "Shipping Address",
+            "subtitle": "Enter the address where your order should be delivered.",
+            "country": "Country",
+            "city": "City",
+            "county": "County",
+            "street": "Street Address"
+        },
+        "actions": {
+            "remove": "Remove",
+            "decreaseQuantity": "Decrease quantity",
+            "increaseQuantity": "Increase quantity",
+            "placeOrder": "Place Order",
+            "clear": "Clear Cart",
+            "tryAgain": "Try Again",
+            "browseProducts": "Browse Products"
+        },
+        "notifications": {
+            "orderPlaced": "Order placed",
+            "orderPlacedMessage": "Your order is being processed.",
+            "orderFailed": "Order failed",
+            "orderFailedMessage": "Please try again in a moment."
+        }
+    },
+    "orders": {
+        "title": "Orders",
+        "subtitle": "Track your recent purchases.",
+        "empty": "No orders yet.",
+        "labels": {
+            "order": "Order",
+            "items": "Items",
+            "total": "Total",
+            "shipTo": "Ship To",
+            "addressUnavailable": "Address unavailable",
+            "quantity": "Qty"
+        },
+        "actions": {
+            "tryAgain": "Try Again",
+            "viewDetails": "View Details",
+            "backToOrders": "Back to Orders"
+        },
+        "errors": {
+            "loadAll": "Failed to load orders",
+            "loadOne": "Failed to load order"
+        }
+    }
+}

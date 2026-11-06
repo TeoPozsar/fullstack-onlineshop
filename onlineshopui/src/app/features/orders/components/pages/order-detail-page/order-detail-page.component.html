@@ -5,7 +5,7 @@
             class="mb-6 flex items-center gap-2 text-text-muted hover:text-text transition-colors"
         >
             <app-icon name="chevron-left" size="sm" />
-            Back to Orders
+            {{ 'orders.actions.backToOrders' | transloco }}
         </button>
 
         @if (loading()) {
@@ -19,7 +19,7 @@
                     (click)="retry()"
                     class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
                 >
-                    Try Again
+                    {{ 'orders.actions.tryAgain' | transloco }}
                 </button>
             </div>
         }
@@ -30,18 +30,18 @@
                     <div class="flex flex-col gap-4">
                         <div class="flex items-start justify-between">
                             <div>
-                                <div class="text-sm text-text-muted">Order</div>
+                                <div class="text-sm text-text-muted">{{ 'orders.labels.order' | transloco }}</div>
                                 <div class="text-2xl font-semibold text-text">
                                     {{ order()!.id }}
                                 </div>
                             </div>
-                            <div class="text-sm text-text-muted">{{ order()!.createdAt }}</div>
+                            <div class="text-sm text-text-muted">{{ createdDate() }}</div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             @if (order()!.address; as address) {
                                 <div>
-                                    <div class="text-sm text-text-muted">Ship To</div>
+                                    <div class="text-sm text-text-muted">{{ 'orders.labels.shipTo' | transloco }}</div>
                                     <div class="text-text font-medium">
                                         {{ address.streetAddress }}
                                     </div>
@@ -52,14 +52,14 @@
                                 </div>
                             } @else {
                                 <div>
-                                    <div class="text-sm text-text-muted">Ship To</div>
-                                    <div class="text-text">Address unavailable</div>
+                                    <div class="text-sm text-text-muted">{{ 'orders.labels.shipTo' | transloco }}</div>
+                                    <div class="text-text">{{ 'orders.labels.addressUnavailable' | transloco }}</div>
                                 </div>
                             }
                             <div class="text-right">
-                                <div class="text-sm text-text-muted">Total</div>
+                                <div class="text-sm text-text-muted">{{ 'orders.labels.total' | transloco }}</div>
                                 <div class="text-2xl font-semibold text-text">
-                                    ${{ totalAmount() }}
+                                    {{ totalAmount() }}
                                 </div>
                             </div>
                         </div>
@@ -68,7 +68,7 @@
 
                 <app-card>
                     <div class="space-y-4">
-                        <div class="text-lg font-semibold text-text">Items</div>
+                        <div class="text-lg font-semibold text-text">{{ 'orders.labels.items' | transloco }}</div>
                         <div class="space-y-4">
                             @for (item of order()!.details ?? []; track item.product.id) {
                                 <div
@@ -92,12 +92,12 @@
                                                 {{ item.product.name }}
                                             </div>
                                             <div class="text-sm text-text-muted">
-                                                Qty: {{ item.quantity }}
+                                                {{ 'orders.labels.quantity' | transloco }}: {{ item.quantity }}
                                             </div>
                                         </div>
                                     </div>
                                     <div class="text-text font-semibold">
-                                        ${{ (item.quantity * item.product.price).toFixed(2) }}
+                                        {{ lineTotal(item.quantity, item.product.price) }}
                                     </div>
                                 </div>
                             }

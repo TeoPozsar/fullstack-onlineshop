@@ -3,8 +3,10 @@
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
             <div class="flex items-center gap-2">
-                <img src="/logo.svg" alt="Online Shop" class="w-10 h-10" />
-                <span class="text-xl font-semibold text-text tracking-tight">Online Shop</span>
+                <img src="/logo.svg" [alt]="'app.name' | transloco" class="w-10 h-10" />
+                <span class="text-xl font-semibold text-text tracking-tight">{{
+                    'app.name' | transloco
+                }}</span>
             </div>
 
             <!-- Desktop Navigation -->
@@ -14,21 +16,21 @@
                     routerLinkActive="text-primary font-semibold"
                     class="text-text hover:text-primary transition-colors"
                 >
-                    Products
+                    {{ 'nav.products' | transloco }}
                 </a>
                 <a
                     [routerLink]="ordersLink"
                     routerLinkActive="text-primary font-semibold"
                     class="text-text hover:text-primary transition-colors"
                 >
-                    Orders
+                    {{ 'nav.orders' | transloco }}
                 </a>
                 <a
                     [routerLink]="cartLink"
                     routerLinkActive="text-primary font-semibold"
                     class="text-text hover:text-primary transition-colors"
                 >
-                    Cart
+                    {{ 'nav.cart' | transloco }}
                 </a>
             </div>
 
@@ -46,6 +48,7 @@
                         <app-icon name="moon" size="sm" />
                     }
                 </button>
+                <app-language-switcher />
 
                 <!-- Auth Buttons -->
                 @if (!authService.isAuthenticated()) {
@@ -53,24 +56,24 @@
                         [routerLink]="loginLink"
                         class="px-4 py-2 text-text hover:text-primary transition-colors"
                     >
-                        Login
+                        {{ 'nav.login' | transloco }}
                     </a>
                     <a
                         [routerLink]="registerLink"
                         class="px-4 py-2 rounded-full bg-primary hover:bg-accent text-primary-foreground font-medium transition-colors"
                     >
-                        Register
+                        {{ 'nav.register' | transloco }}
                     </a>
                 } @else {
                     <span class="text-sm text-text">
-                        {{ userEmail() ?? 'Unknown user' }}
+                        {{ userEmail() ?? ('nav.unknownUser' | transloco) }}
                     </span>
                     <button
                         (click)="logout()"
                         type="button"
                         class="px-4 py-2 rounded-full border border-border hover:bg-surface-2 text-text font-medium transition-colors"
                     >
-                        Logout
+                        {{ 'nav.logout' | transloco }}
                     </button>
                 }
             </div>
@@ -96,7 +99,7 @@
                     routerLinkActive="text-primary font-semibold"
                     class="block px-3 py-2 text-text hover:bg-surface-2 rounded-lg transition-colors"
                 >
-                    Products
+                    {{ 'nav.products' | transloco }}
                 </a>
                 <a
                     [routerLink]="ordersLink"
@@ -104,7 +107,7 @@
                     routerLinkActive="text-primary font-semibold"
                     class="block px-3 py-2 text-text hover:bg-surface-2 rounded-lg transition-colors"
                 >
-                    Orders
+                    {{ 'nav.orders' | transloco }}
                 </a>
                 <a
                     [routerLink]="cartLink"
@@ -112,7 +115,7 @@
                     routerLinkActive="text-primary font-semibold"
                     class="block px-3 py-2 text-text hover:bg-surface-2 rounded-lg transition-colors"
                 >
-                    Cart
+                    {{ 'nav.cart' | transloco }}
                 </a>
                 <div class="border-t border-border pt-2 mt-2">
                     <button
@@ -122,12 +125,13 @@
                     >
                         @if (themeService.isDarkMode()) {
                             <app-icon name="sun" size="sm" />
-                            <span>Light Mode</span>
+                            <span>{{ 'nav.lightMode' | transloco }}</span>
                         } @else {
                             <app-icon name="moon" size="sm" />
-                            <span>Dark Mode</span>
+                            <span>{{ 'nav.darkMode' | transloco }}</span>
                         }
                     </button>
+                    <app-language-switcher />
                 </div>
 
                 <div class="border-t border-border pt-2 mt-2">
@@ -137,25 +141,25 @@
                             (click)="closeMobileMenu()"
                             class="block px-3 py-2 text-text hover:bg-surface-2 rounded-lg transition-colors"
                         >
-                            Login
+                            {{ 'nav.login' | transloco }}
                         </a>
                         <a
                             [routerLink]="registerLink"
                             (click)="closeMobileMenu()"
                             class="block px-3 py-2 mt-2 text-center rounded-full bg-primary hover:bg-accent text-primary-foreground font-medium transition-colors"
                         >
-                            Register
+                            {{ 'nav.register' | transloco }}
                         </a>
                     } @else {
                         <div class="px-3 py-2 text-sm text-text">
-                            {{ userEmail() ?? 'Unknown user' }}
+                            {{ userEmail() ?? ('nav.unknownUser' | transloco) }}
                         </div>
                         <button
                             (click)="logout()"
                             type="button"
                             class="w-full px-3 py-2 mt-2 text-left rounded-lg border border-border hover:bg-surface-2 text-text font-medium transition-colors"
                         >
-                            Logout
+                            {{ 'nav.logout' | transloco }}
                         </button>
                     }
                 </div>

@@ -2,16 +2,36 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
+import { translocoTestingImports } from '../../../../../core/testing/transloco-testing';
 import { signal } from '@angular/core';
 import { ProductCreatePageComponent } from './product-create-page.component';
 import { ProductService } from '../../../services/product.service';
+import { SupplierService } from '../../../services/supplier.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
-import { MOCK_CATEGORIES, MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
+import {
+    MOCK_CATEGORIES,
+    MOCK_PRODUCTS,
+    MOCK_SUPPLIERS
+} from '../../../../../core/mocks/data/products.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { ValidationMessages } from '../../../../../core/types/providers/validation-messages';
-import { DefaultValidationMessages } from '../../../../../core/config/constants/validation.constants';
+import { createDefaultValidationMessages } from '../../../../../core/config/constants/validation.constants';
+import { TranslocoService } from '@jsverse/transloco';
 
 describe('ProductCreatePageComponent', () => {
+    const translocoServiceMock = {
+        langChanges$: of('en'),
+        getActiveLang: vi.fn().mockReturnValue('en'),
+        translate: vi.fn().mockImplementation((key: string) => ({
+            'products.notifications.created': 'Product created',
+            'products.notifications.createdMessage': 'The product was created successfully.',
+            'products.notifications.createFailed': 'Create failed',
+            'products.notifications.createFailedMessage': 'The product could not be created.'
+        })[key] ?? key),
+        setActiveLang: vi.fn(),
+        _loadDependencies: vi.fn().mockReturnValue(of({})),
+        config: { reRenderOnLangChange: true }
+    };
     let component: ProductCreatePageComponent;
     let fixture: ComponentFixture<ProductCreatePageComponent>;
     let productServiceMock: {
@@ -19,6 +39,12 @@ describe('ProductCreatePageComponent', () => {
         loading: ReturnType<typeof signal>;
         loadCategories: ReturnType<typeof vi.fn>;
         create: ReturnType<typeof vi.fn>;
+    };
+    let supplierServiceMock: {
+        suppliers: ReturnType<typeof signal>;
+        loading: ReturnType<typeof signal>;
+        error: ReturnType<typeof signal>;
+        loadAll: ReturnType<typeof vi.fn>;
     };
     let routerMock: {
         navigate: ReturnType<typeof vi.fn>;
@@ -31,12 +57,20 @@ describe('ProductCreatePageComponent', () => {
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args) => {
+            void args;
+        });
         productServiceMock = {
             categories: signal([...MOCK_CATEGORIES]),
             loading: signal(false),
             loadCategories: vi.fn().mockReturnValue(of(MOCK_CATEGORIES)),
             create: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0]))
+        };
+        supplierServiceMock = {
+            suppliers: signal([...MOCK_SUPPLIERS]),
+            loading: signal(false),
+            error: signal(null),
+            loadAll: vi.fn().mockReturnValue(of(MOCK_SUPPLIERS))
         };
 
         routerMock = {
@@ -49,12 +83,17 @@ describe('ProductCreatePageComponent', () => {
         };
 
         TestBed.configureTestingModule({
-            imports: [ProductCreatePageComponent],
+            imports: [ProductCreatePageComponent, ...translocoTestingImports],
             providers: [
                 { provide: ProductService, useValue: productServiceMock },
+                { provide: SupplierService, useValue: supplierServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
-                { provide: ValidationMessages, useValue: DefaultValidationMessages }
+                {
+                    provide: ValidationMessages,
+                    useValue: createDefaultValidationMessages(translocoServiceMock)
+                },
+                { provide: TranslocoService, useValue: translocoServiceMock }
             ]
         });
 
@@ -87,6 +126,7 @@ describe('ProductCreatePageComponent', () => {
 
             // Verify
             expect(productServiceMock.loadCategories).toHaveBeenCalled();
+            expect(supplierServiceMock.loadAll).toHaveBeenCalled();
         });
 
         it('should initialize with empty form', () => {
@@ -103,8 +143,23 @@ describe('ProductCreatePageComponent', () => {
                 price: 0,
                 weight: 0,
                 imageUrl: '',
-                categoryId: ''
+                categoryId: '',
+                supplierId: ''
             });
+        });
+    });
+
+    describe('supplier loading', () => {
+        it('should display supplier errors and allow retrying', () => {
+            supplierServiceMock.error.set('Failed to load suppliers');
+            fixture.detectChanges();
+
+            expect(fixture.nativeElement.textContent).toContain('Failed to load suppliers');
+
+            supplierServiceMock.loadAll.mockClear();
+            component.retrySuppliers();
+
+            expect(supplierServiceMock.loadAll).toHaveBeenCalledOnce();
         });
     });
 
@@ -131,7 +186,8 @@ describe('ProductCreatePageComponent', () => {
                 price: 99.99,
                 weight: 1.5,
                 imageUrl: 'http://test.com/image.jpg',
-                categoryId: 'cat-1'
+                categoryId: 'cat-1',
+                supplierId: MOCK_SUPPLIERS[0].id
             });
 
             // Action
@@ -139,9 +195,12 @@ describe('ProductCreatePageComponent', () => {
 
             // Verify
             expect(productServiceMock.create).toHaveBeenCalled();
+            expect(productServiceMock.create).toHaveBeenCalledWith(
+                expect.objectContaining({ supplierId: MOCK_SUPPLIERS[0].id })
+            );
             expect(notificationsServiceMock.notifySuccess).toHaveBeenCalledWith({
                 title: 'Product created',
-                message: 'Your new product is now available.'
+                message: 'The product was created successfully.'
             });
             expect(routerMock.navigate).toHaveBeenCalledWith([
                 `/${AppNavRoutes.Products.root}/${AppNavRoutes.Products.features.overview}`
@@ -157,7 +216,8 @@ describe('ProductCreatePageComponent', () => {
                 price: 99.99,
                 weight: 1.5,
                 imageUrl: 'http://test.com/image.jpg',
-                categoryId: 'cat-1'
+                categoryId: 'cat-1',
+                supplierId: MOCK_SUPPLIERS[0].id
             });
             productServiceMock.create.mockReturnValue(throwError(() => new Error('Failed')));
 
@@ -167,7 +227,7 @@ describe('ProductCreatePageComponent', () => {
             // Verify
             expect(notificationsServiceMock.notifyError).toHaveBeenCalledWith({
                 title: 'Create failed',
-                message: 'Unable to create the product.'
+                message: 'The product could not be created.'
             });
             expect(routerMock.navigate).not.toHaveBeenCalled();
         });
@@ -181,7 +241,8 @@ describe('ProductCreatePageComponent', () => {
                 price: 99.99,
                 weight: 1.5,
                 imageUrl: 'http://test.com/image.jpg',
-                categoryId: 'cat-1'
+                categoryId: 'cat-1',
+                supplierId: MOCK_SUPPLIERS[0].id
             });
             expect(component.form.enabled).toBe(true);
 

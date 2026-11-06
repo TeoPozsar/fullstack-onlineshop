@@ -24,6 +24,8 @@ import {
     toCreateOrderDto
 } from '../../../utils/cart.utils';
 import { createAddressForm } from '../../../utils/address-form.utils';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { LanguageService } from '../../../../../core/services/language.service';
 
 @Component({
     selector: 'app-cart-overview-page',
@@ -33,7 +35,8 @@ import { createAddressForm } from '../../../utils/address-form.utils';
         CartItemRowComponent,
         CartSummaryComponent,
         ReactiveFormsModule,
-        RouterLink
+        RouterLink,
+        TranslocoPipe
     ],
     templateUrl: './cart-overview-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -44,6 +47,8 @@ export class CartOverviewPageComponent implements OnInit {
     private readonly ordersService = inject(OrdersService);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
+    private readonly translocoService = inject(TranslocoService);
+    private readonly languageService = inject(LanguageService);
 
     readonly cartItems = this.cartService.items;
     readonly products = this.productService.products;
@@ -60,7 +65,11 @@ export class CartOverviewPageComponent implements OnInit {
     readonly productsById = computed(() => buildProductsById(this.products()));
 
     readonly subtotal = computed(() =>
-        calculateCartSubtotal(this.cartItems(), this.productsById())
+        calculateCartSubtotal(
+            this.cartItems(),
+            this.productsById(),
+            this.languageService.activeLanguage()
+        )
     );
 
     readonly itemCount = this.cartService.totalItems;
@@ -101,8 +110,10 @@ export class CartOverviewPageComponent implements OnInit {
                     this.isSubmitting.set(false);
                     this.cartService.clear();
                     this.notificationsService.notifySuccess({
-                        title: 'Order placed',
-                        message: 'Your order is being processed.'
+                        title: this.translocoService.translate('cart.notifications.orderPlaced'),
+                        message: this.translocoService.translate(
+                            'cart.notifications.orderPlacedMessage'
+                        )
                     });
                     this.router.navigate([
                         '/',
@@ -113,8 +124,10 @@ export class CartOverviewPageComponent implements OnInit {
                 error: err => {
                     console.error('Failed to create order:', err);
                     this.notificationsService.notifyError({
-                        title: 'Order failed',
-                        message: 'Please try again in a moment.'
+                        title: this.translocoService.translate('cart.notifications.orderFailed'),
+                        message: this.translocoService.translate(
+                            'cart.notifications.orderFailedMessage'
+                        )
                     });
                     this.isSubmitting.set(false);
                 }

@@ -1,8 +1,16 @@
 import { HttpClient } from '@angular/common/http';
+import { computed } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable, tap, finalize, catchError, of, map } from 'rxjs';
-import { ProductDto, ProductCategoryDto } from '../../../core/types/dtos/product.dto';
+import {
+    ProductDto,
+    ProductCategoryDto,
+    CreateProductRequest,
+    UpdateProductRequest
+} from '../../../core/types/dtos/product.dto';
 import { EnvironmentConfig } from '../../../core/types/providers/environment-config';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
     providedIn: 'root'
@@ -10,6 +18,11 @@ import { EnvironmentConfig } from '../../../core/types/providers/environment-con
 export class ProductService {
     private readonly http = inject(HttpClient);
     private readonly environmentConfig = inject(EnvironmentConfig);
+    private readonly translocoService = inject(TranslocoService);
+    private readonly languageChanges = toSignal(
+        this.translocoService.langChanges$ ?? of('en'),
+        { initialValue: 'en' }
+    );
     private readonly productsUrl = `${this.environmentConfig.apiUrl}/products`;
     private readonly categoriesUrl = `${this.environmentConfig.apiUrl}/products/categories`;
 
@@ -17,23 +30,28 @@ export class ProductService {
     private readonly _selectedProduct = signal<ProductDto | null>(null);
     private readonly _categories = signal<ProductCategoryDto[]>([]);
     private readonly _loading = signal(false);
-    private readonly _error = signal<string | null>(null);
+    private readonly _errorKey = signal<string | null>(null);
 
     readonly products = this._products.asReadonly();
     readonly selectedProduct = this._selectedProduct.asReadonly();
     readonly categories = this._categories.asReadonly();
     readonly loading = this._loading.asReadonly();
-    readonly error = this._error.asReadonly();
+    readonly errorKey = this._errorKey.asReadonly();
+    readonly error = computed(() => {
+        this.languageChanges();
+        const key = this._errorKey();
+        return key ? this.translocoService.translate(key) : null;
+    });
 
     loadAll(): Observable<void> {
         this._loading.set(true);
-        this._error.set(null);
+        this._errorKey.set(null);
 
         return this.http.get<ProductDto[]>(this.productsUrl).pipe(
             tap(products => this._products.set(products)),
-            tap(() => this._error.set(null)),
+            tap(() => this._errorKey.set(null)),
             catchError(() => {
-                this._error.set('Failed to load products');
+                this._errorKey.set('products.errors.loadAll');
                 return of([]);
             }),
             finalize(() => this._loading.set(false)),
@@ -43,13 +61,13 @@ export class ProductService {
 
     loadById(id: string): Observable<void> {
         this._loading.set(true);
-        this._error.set(null);
+        this._errorKey.set(null);
 
         return this.http.get<ProductDto>(`${this.productsUrl}/${id}`).pipe(
             tap(product => this._selectedProduct.set(product)),
-            tap(() => this._error.set(null)),
+            tap(() => this._errorKey.set(null)),
             catchError(() => {
-                this._error.set('Failed to load product');
+                this._errorKey.set('products.errors.loadOne');
                 this._selectedProduct.set(null);
                 return of(null);
             }),
@@ -60,13 +78,13 @@ export class ProductService {
 
     loadCategories(): Observable<void> {
         this._loading.set(true);
-        this._error.set(null);
+        this._errorKey.set(null);
 
         return this.http.get<ProductCategoryDto[]>(this.categoriesUrl).pipe(
             tap(categories => this._categories.set(categories)),
-            tap(() => this._error.set(null)),
+            tap(() => this._errorKey.set(null)),
             catchError(() => {
-                this._error.set('Failed to load categories');
+                this._errorKey.set('products.errors.categories');
                 return of([]);
             }),
             finalize(() => this._loading.set(false)),
@@ -74,9 +92,7 @@ export class ProductService {
         );
     }
 
-    create(
-        data: Omit<ProductDto, 'id' | 'category'> & { categoryId: string }
-    ): Observable<ProductDto> {
+    create(data: CreateProductRequest): Observable<ProductDto> {
         return this.http.post<ProductDto>(this.productsUrl, data).pipe(
             tap(newProduct => {
                 this._products.update(products => [...products, newProduct]);
@@ -84,10 +100,7 @@ export class ProductService {
         );
     }
 
-    update(
-        id: string,
-        data: Partial<ProductDto> & { categoryId?: string }
-    ): Observable<ProductDto> {
+    update(id: string, data: UpdateProductRequest): Observable<ProductDto> {
         return this.http.put<ProductDto>(`${this.productsUrl}/${id}`, data).pipe(
             tap(updatedProduct => {
                 this._products.update(products =>

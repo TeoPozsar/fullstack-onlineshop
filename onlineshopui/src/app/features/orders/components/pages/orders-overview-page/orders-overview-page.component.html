@@ -2,8 +2,8 @@
     <div class="container mx-auto px-4 max-w-6xl">
         <div class="flex flex-wrap items-end justify-between gap-4 mb-10">
             <div>
-                <h1 class="text-3xl font-semibold text-text tracking-tight">Orders</h1>
-                <p class="mt-2 text-text-muted max-w-xl">Track your recent purchases.</p>
+                <h1 class="text-3xl font-semibold text-text tracking-tight">{{ 'orders.title' | transloco }}</h1>
+                <p class="mt-2 text-text-muted max-w-xl">{{ 'orders.subtitle' | transloco }}</p>
             </div>
         </div>
 
@@ -18,14 +18,14 @@
                     (click)="retry()"
                     class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
                 >
-                    Try Again
+                    {{ 'orders.actions.tryAgain' | transloco }}
                 </button>
             </div>
         }
 
         @if (!loading() && !error() && orderSummaries().length === 0) {
             <div class="text-center py-16">
-                <p class="text-text-muted text-lg">No orders yet.</p>
+                <p class="text-text-muted text-lg">{{ 'orders.empty' | transloco }}</p>
             </div>
         }
 

@@ -2,8 +2,8 @@
     <div class="container mx-auto px-4 max-w-3xl">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-text">Edit Product</h1>
-            <p class="mt-2 text-text-muted">Update product information</p>
+            <h1 class="text-3xl font-bold text-text">{{ 'products.update.title' | transloco }}</h1>
+            <p class="mt-2 text-text-muted">{{ 'products.update.subtitle' | transloco }}</p>
         </div>
 
         <!-- Loading State -->
@@ -21,19 +21,48 @@
                     (click)="retry()"
                     class="px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white rounded-md transition-colors"
                 >
-                    Try Again
+                    {{ 'products.actions.tryAgain' | transloco }}
                 </button>
             </div>
         }
 
+        @if (supplierLoading() && suppliers().length === 0) {
+            <p class="mb-4 text-text-muted" role="status">
+                {{ 'products.suppliers.loading' | transloco }}
+            </p>
+        }
+
+        @if (supplierError() && !supplierLoading()) {
+            <div
+                class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center"
+                role="alert"
+            >
+                <p class="text-red-800 dark:text-red-200 mb-4">{{ supplierError() }}</p>
+                <button
+                    type="button"
+                    (click)="retrySuppliers()"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white rounded-md transition-colors"
+                >
+                    {{ 'products.suppliers.retry' | transloco }}
+                </button>
+            </div>
+        }
+
+        @if (!supplierLoading() && !supplierError() && suppliers().length === 0) {
+            <p class="mb-4 text-text-muted" role="status">
+                {{ 'products.suppliers.empty' | transloco }}
+            </p>
+        }
+
         <!-- Form -->
-        @if (product() && categories().length > 0) {
+        @if (product() && categories().length > 0 && suppliers().length > 0) {
             <app-card>
                 <app-product-form
                     [form]="form"
                     [categories]="categories()"
+                    [suppliers]="suppliers()"
                     [isSubmitting]="isSubmitting()"
-                    [submitLabel]="'Update Product'"
+                    [submitLabel]="'products.actions.update' | transloco"
                     (formSubmit)="onSubmit()"
                     (cancelled)="onCancel()"
                 />

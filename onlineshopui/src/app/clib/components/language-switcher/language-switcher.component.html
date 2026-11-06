@@ -1,0 +1,13 @@
+<div class="flex items-center gap-1" [attr.aria-label]="'language.switch' | transloco">
+    @for (language of availableLanguages; track language) {
+        <button
+            type="button"
+            class="px-2 py-1 rounded text-sm text-text-muted hover:bg-surface-2 transition-colors"
+            [class.font-semibold]="activeLanguage() === language"
+            [attr.aria-current]="activeLanguage() === language ? 'true' : null"
+            (click)="selectLanguage(language)"
+        >
+            {{ 'language.' + language | transloco }}
+        </button>
+    }
+</div>

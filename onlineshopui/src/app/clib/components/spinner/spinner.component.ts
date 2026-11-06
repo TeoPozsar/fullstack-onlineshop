@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
     selector: 'app-spinner',
-    imports: [],
+    imports: [TranslocoPipe],
     templateUrl: './spinner.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })

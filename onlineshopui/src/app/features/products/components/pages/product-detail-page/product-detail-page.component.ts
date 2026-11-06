@@ -15,11 +15,14 @@ import { CartService } from '../../../../cart/services/cart.service';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { take } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { LanguageService } from '../../../../../core/services/language.service';
+import { formatCurrency } from '../../../../../core/utils/locale-format.utils';
 
 @Component({
     selector: 'app-product-detail-page',
     standalone: true,
-    imports: [CardComponent, SpinnerComponent, IconComponent],
+    imports: [CardComponent, SpinnerComponent, IconComponent, TranslocoPipe],
     templateUrl: './product-detail-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -29,6 +32,8 @@ export class ProductDetailPageComponent implements OnInit {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
+    private readonly translocoService = inject(TranslocoService);
+    private readonly languageService = inject(LanguageService);
 
     readonly product = this.productService.selectedProduct;
     readonly loading = this.productService.loading;
@@ -38,8 +43,15 @@ export class ProductDetailPageComponent implements OnInit {
     readonly totalPrice = computed(() => {
         const prod = this.product();
         const qty = this.quantity();
-        return prod ? (prod.price * qty).toFixed(2) : '0.00';
+        return formatCurrency(
+            prod ? prod.price * qty : 0,
+            this.languageService.activeLanguage()
+        );
     });
+
+    formatPrice(price: number): string {
+        return formatCurrency(price, this.languageService.activeLanguage());
+    }
 
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id');
@@ -74,8 +86,10 @@ export class ProductDetailPageComponent implements OnInit {
         if (prod) {
             this.cartService.addItem(prod.id, this.quantity());
             this.notificationsService.notifySuccess({
-                title: 'Added to cart',
-                message: `${prod.name} was added to your cart.`
+                title: this.translocoService.translate('products.notifications.addedTitle'),
+                message: this.translocoService.translate('products.notifications.addedMessage', {
+                    name: prod.name
+                })
             });
         }
     }

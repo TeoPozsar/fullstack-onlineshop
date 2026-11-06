@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, input, output, HostListener } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { IconComponent } from '../icon/icon.component';
 
 @Component({
     selector: 'app-modal',
-    imports: [IconComponent],
+    imports: [IconComponent, TranslocoPipe],
     templateUrl: './modal.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })

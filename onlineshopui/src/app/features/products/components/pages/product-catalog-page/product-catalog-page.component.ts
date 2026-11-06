@@ -19,11 +19,19 @@ import { NotificationsService } from '../../../../../core/services/notifications
 import { HasRoleDirective } from '../../../../auth/directives/has-role.directive';
 import { UserRole } from '../../../../../core/types/enums/user-roles.enum';
 import { take } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
     selector: 'app-product-catalog-page',
     standalone: true,
-    imports: [ProductCardComponent, SpinnerComponent, ModalComponent, RouterLink, HasRoleDirective],
+    imports: [
+        ProductCardComponent,
+        SpinnerComponent,
+        ModalComponent,
+        RouterLink,
+        HasRoleDirective,
+        TranslocoPipe
+    ],
     templateUrl: './product-catalog-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -33,6 +41,7 @@ export class ProductCatalogPageComponent implements OnInit {
     private readonly router = inject(Router);
     private readonly destroyRef = inject(DestroyRef);
     private readonly notificationsService = inject(NotificationsService);
+    private readonly translocoService = inject(TranslocoService);
 
     readonly products = this.productService.products;
     readonly loading = this.productService.loading;
@@ -54,10 +63,12 @@ export class ProductCatalogPageComponent implements OnInit {
     onAddToCart(productId: string): void {
         this.cartService.addItem(productId, 1);
         const product = this.products().find(item => item.id === productId);
-        const name = product?.name ?? 'Product';
+        const name = product?.name ?? this.translocoService.translate('products.name');
         this.notificationsService.notifySuccess({
-            title: 'Added to cart',
-            message: `${name} was added to your cart.`
+            title: this.translocoService.translate('products.notifications.addedTitle'),
+            message: this.translocoService.translate('products.notifications.addedMessage', {
+                name
+            })
         });
     }
 
@@ -93,8 +104,12 @@ export class ProductCatalogPageComponent implements OnInit {
                         this.showDeleteModal.set(false);
                         this.productToDelete.set(null);
                         this.notificationsService.notifyError({
-                            title: 'Delete failed',
-                            message: err.error?.error || 'An unexpected error occurred while deleting the product.'
+                            title: this.translocoService.translate('products.notifications.deleteFailed'),
+                            message:
+                                err.error?.error ||
+                                this.translocoService.translate(
+                                    'products.notifications.deleteUnexpected'
+                                )
                         });
                     }
             });

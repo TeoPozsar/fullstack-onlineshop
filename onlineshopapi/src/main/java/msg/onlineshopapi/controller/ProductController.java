@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import msg.onlineshopapi.dto.ProductRequestDto;
 import msg.onlineshopapi.dto.ProductResponseDto;
@@ -50,7 +51,7 @@ public class ProductController {
     @Operation(summary = "Create a product", description = "Creates a new product. Requires ADMIN role.")
     @ApiResponse(responseCode = "200", description = "Product created successfully")
     @ApiResponse(responseCode = "403", description = "Access denied")
-    public ProductResponseDto create(@RequestBody ProductRequestDto dto) {
+    public ProductResponseDto create(@Valid @RequestBody ProductRequestDto dto) {
         return productMapper.toDto(productService.save(productMapper.toEntity(dto)));
     }
 
@@ -60,7 +61,8 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "Product updated successfully")
     @ApiResponse(responseCode = "403", description = "Access denied")
     @ApiResponse(responseCode = "404", description = "Product not found")
-    public ProductResponseDto update(@Parameter(description = "Product ID") @PathVariable UUID id, @RequestBody ProductRequestDto dto) {
+    public ProductResponseDto update(@Parameter(description = "Product ID") @PathVariable UUID id,
+                                     @Valid @RequestBody ProductRequestDto dto) {
         return productMapper.toDto(productService.update(id, productMapper.toEntity(dto)));
     }
 

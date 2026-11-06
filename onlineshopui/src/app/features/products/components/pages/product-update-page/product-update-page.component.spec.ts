@@ -2,16 +2,36 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
+import { translocoTestingImports } from '../../../../../core/testing/transloco-testing';
 import { signal } from '@angular/core';
 import { ProductUpdatePageComponent } from './product-update-page.component';
 import { ProductService } from '../../../services/product.service';
+import { SupplierService } from '../../../services/supplier.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
-import { MOCK_CATEGORIES, MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
+import {
+    MOCK_CATEGORIES,
+    MOCK_PRODUCTS,
+    MOCK_SUPPLIERS
+} from '../../../../../core/mocks/data/products.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { ValidationMessages } from '../../../../../core/types/providers/validation-messages';
-import { DefaultValidationMessages } from '../../../../../core/config/constants/validation.constants';
+import { createDefaultValidationMessages } from '../../../../../core/config/constants/validation.constants';
+import { TranslocoService } from '@jsverse/transloco';
 
 describe('ProductUpdatePageComponent', () => {
+    const translocoServiceMock = {
+        langChanges$: of('en'),
+        getActiveLang: vi.fn().mockReturnValue('en'),
+        translate: vi.fn().mockImplementation((key: string) => ({
+            'products.notifications.updated': 'Product updated',
+            'products.notifications.updatedMessage': 'The product was updated successfully.',
+            'products.notifications.updateFailed': 'Update failed',
+            'products.notifications.updateFailedMessage': 'The product could not be updated.'
+        })[key] ?? key),
+        setActiveLang: vi.fn(),
+        _loadDependencies: vi.fn().mockReturnValue(of({})),
+        config: { reRenderOnLangChange: true }
+    };
     let component: ProductUpdatePageComponent;
     let fixture: ComponentFixture<ProductUpdatePageComponent>;
     let productServiceMock: {
@@ -22,6 +42,12 @@ describe('ProductUpdatePageComponent', () => {
         loadById: ReturnType<typeof vi.fn>;
         loadCategories: ReturnType<typeof vi.fn>;
         update: ReturnType<typeof vi.fn>;
+    };
+    let supplierServiceMock: {
+        suppliers: ReturnType<typeof signal>;
+        loading: ReturnType<typeof signal>;
+        error: ReturnType<typeof signal>;
+        loadAll: ReturnType<typeof vi.fn>;
     };
     let routerMock: {
         navigate: ReturnType<typeof vi.fn>;
@@ -39,7 +65,9 @@ describe('ProductUpdatePageComponent', () => {
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args) => {
+            void args;
+        });
         productServiceMock = {
             selectedProduct: signal(MOCK_PRODUCTS[0]),
             categories: signal([...MOCK_CATEGORIES]),
@@ -48,6 +76,12 @@ describe('ProductUpdatePageComponent', () => {
             loadById: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0])),
             loadCategories: vi.fn().mockReturnValue(of(MOCK_CATEGORIES)),
             update: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0]))
+        };
+        supplierServiceMock = {
+            suppliers: signal([...MOCK_SUPPLIERS]),
+            loading: signal(false),
+            error: signal(null),
+            loadAll: vi.fn().mockReturnValue(of(MOCK_SUPPLIERS))
         };
 
         routerMock = {
@@ -66,13 +100,18 @@ describe('ProductUpdatePageComponent', () => {
         };
 
         TestBed.configureTestingModule({
-            imports: [ProductUpdatePageComponent],
+            imports: [ProductUpdatePageComponent, ...translocoTestingImports],
             providers: [
                 { provide: ProductService, useValue: productServiceMock },
+                { provide: SupplierService, useValue: supplierServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: ActivatedRoute, useValue: activatedRouteMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
-                { provide: ValidationMessages, useValue: DefaultValidationMessages }
+                {
+                    provide: ValidationMessages,
+                    useValue: createDefaultValidationMessages(translocoServiceMock)
+                },
+                { provide: TranslocoService, useValue: translocoServiceMock }
             ]
         });
 
@@ -106,6 +145,7 @@ describe('ProductUpdatePageComponent', () => {
             // Verify
             expect(productServiceMock.loadById).toHaveBeenCalledWith('prod-1');
             expect(productServiceMock.loadCategories).toHaveBeenCalled();
+            expect(supplierServiceMock.loadAll).toHaveBeenCalled();
         });
 
         it('should navigate to products overview when no id provided', () => {
@@ -135,7 +175,8 @@ describe('ProductUpdatePageComponent', () => {
                 price: MOCK_PRODUCTS[0].price,
                 weight: MOCK_PRODUCTS[0].weight,
                 imageUrl: MOCK_PRODUCTS[0].imageUrl,
-                categoryId: MOCK_PRODUCTS[0].category.id
+                categoryId: MOCK_PRODUCTS[0].category.id,
+                supplierId: MOCK_PRODUCTS[0].supplier.id
             });
         });
     });
@@ -162,7 +203,8 @@ describe('ProductUpdatePageComponent', () => {
             // Prepare
             component.form.patchValue({
                 name: 'Updated Product',
-                price: 199.99
+                price: 199.99,
+                supplierId: MOCK_SUPPLIERS[1].id
             });
 
             // Action
@@ -175,11 +217,12 @@ describe('ProductUpdatePageComponent', () => {
                 price: 199.99,
                 weight: MOCK_PRODUCTS[0].weight,
                 imageUrl: MOCK_PRODUCTS[0].imageUrl,
-                categoryId: MOCK_PRODUCTS[0].category.id
+                categoryId: MOCK_PRODUCTS[0].category.id,
+                supplierId: MOCK_SUPPLIERS[1].id
             });
             expect(notificationsServiceMock.notifySuccess).toHaveBeenCalledWith({
                 title: 'Product updated',
-                message: 'Changes have been saved.'
+                message: 'The product was updated successfully.'
             });
             expect(routerMock.navigate).toHaveBeenCalledWith([
                 `/${AppNavRoutes.Products.root}/${AppNavRoutes.Products.features.overview}`
@@ -212,7 +255,7 @@ describe('ProductUpdatePageComponent', () => {
             // Verify
             expect(notificationsServiceMock.notifyError).toHaveBeenCalledWith({
                 title: 'Update failed',
-                message: 'Unable to save changes.'
+                message: 'The product could not be updated.'
             });
             expect(routerMock.navigate).not.toHaveBeenCalled();
         });
@@ -251,6 +294,7 @@ describe('ProductUpdatePageComponent', () => {
             component.ngOnInit();
             productServiceMock.loadById.mockClear();
             productServiceMock.loadCategories.mockClear();
+            supplierServiceMock.loadAll.mockClear();
 
             // Action
             component.retry();
@@ -258,6 +302,7 @@ describe('ProductUpdatePageComponent', () => {
             // Verify
             expect(productServiceMock.loadById).toHaveBeenCalledWith('prod-1');
             expect(productServiceMock.loadCategories).toHaveBeenCalled();
+            expect(supplierServiceMock.loadAll).toHaveBeenCalled();
         });
 
         it('should not reload when no product id', () => {
@@ -266,6 +311,7 @@ describe('ProductUpdatePageComponent', () => {
             component.ngOnInit();
             productServiceMock.loadById.mockClear();
             productServiceMock.loadCategories.mockClear();
+            supplierServiceMock.loadAll.mockClear();
 
             // Action
             component.retry();
@@ -273,6 +319,21 @@ describe('ProductUpdatePageComponent', () => {
             // Verify
             expect(productServiceMock.loadById).not.toHaveBeenCalled();
             expect(productServiceMock.loadCategories).not.toHaveBeenCalled();
+            expect(supplierServiceMock.loadAll).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('supplier loading', () => {
+        it('should display supplier errors and allow retrying', () => {
+            supplierServiceMock.error.set('Failed to load suppliers');
+            fixture.detectChanges();
+
+            expect(fixture.nativeElement.textContent).toContain('Failed to load suppliers');
+
+            supplierServiceMock.loadAll.mockClear();
+            component.retrySuppliers();
+
+            expect(supplierServiceMock.loadAll).toHaveBeenCalledOnce();
         });
     });
 });

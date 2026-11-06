@@ -9,6 +9,9 @@ import { CartService } from '../../../../cart/services/cart.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
+import { TranslocoService } from '@jsverse/transloco';
+import { LanguageService } from '../../../../../core/services/language.service';
+import { formatCurrency } from '../../../../../core/utils/locale-format.utils';
 
 describe('ProductDetailPageComponent', () => {
     let component: ProductDetailPageComponent;
@@ -67,7 +70,26 @@ describe('ProductDetailPageComponent', () => {
                 { provide: CartService, useValue: cartServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: ActivatedRoute, useValue: activatedRouteMock },
-                { provide: NotificationsService, useValue: notificationsServiceMock }
+                { provide: NotificationsService, useValue: notificationsServiceMock },
+                {
+                    provide: TranslocoService,
+                    useValue: {
+                        config: { reRenderOnLangChange: false },
+                        langChanges$: of('en'),
+                        getActiveLang: vi.fn().mockReturnValue('en'),
+                        setActiveLang: vi.fn(),
+                        _loadDependencies: vi.fn().mockReturnValue(of({})),
+                        selectTranslate: vi.fn().mockReturnValue(of('')),
+                        translate: vi.fn().mockImplementation((key: string, params?: { name?: string }) =>
+                            key === 'products.notifications.addedTitle'
+                                ? 'Added to cart'
+                                : key === 'products.notifications.addedMessage'
+                                  ? `${params?.name} was added to your cart.`
+                                  : key
+                        )
+                    }
+                },
+                { provide: LanguageService, useValue: { activeLanguage: signal<'en' | 'de'>('en') } }
             ]
         });
 
@@ -267,7 +289,7 @@ describe('ProductDetailPageComponent', () => {
             const totalPrice = component.totalPrice();
 
             // Verify
-            const expected = (MOCK_PRODUCTS[0].price * 2).toFixed(2);
+            const expected = formatCurrency(MOCK_PRODUCTS[0].price * 2, 'en');
             expect(totalPrice).toBe(expected);
         });
 
@@ -280,7 +302,7 @@ describe('ProductDetailPageComponent', () => {
             const totalPrice = component.totalPrice();
 
             // Verify
-            expect(totalPrice).toBe('0.00');
+            expect(totalPrice).toBe(formatCurrency(0, 'en'));
         });
     });
 });
