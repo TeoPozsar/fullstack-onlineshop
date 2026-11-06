@@ -106,6 +106,50 @@ class OrderServiceTest {
     }
 
     @Test
+    void createOrder_splitsQuantityAndDeductsEachContributingStockByAllocatedAmount() {
+        UUID productId = UUID.randomUUID();
+        Product product = product(productId);
+        Location firstLocation = location();
+        Location secondLocation = location();
+        Stock firstStock = stock(product, firstLocation, 7);
+        Stock secondStock = stock(product, secondLocation, 5);
+        Order order = order(UUID.randomUUID(), orderDetail(product, 10));
+
+        when(userRepository.findByEmail("customer@example.com"))
+                .thenReturn(Optional.of(User.builder().email("customer@example.com").build()));
+        when(orderStrategy.findStocks(anySet())).thenReturn(List.of(firstStock, secondStock));
+        when(orderRepository.save(order)).thenReturn(order);
+
+        orderService.createOrder(order, "customer@example.com");
+
+        assertThat(order.getOrderDetails()).extracting(OrderDetail::getQuantity)
+                .containsExactlyInAnyOrder(7, 3);
+        assertThat(order.getOrderDetails()).extracting(detail -> detail.getShippedFrom())
+                .containsExactlyInAnyOrder(firstLocation, secondLocation);
+        assertThat(firstStock.getQuantity()).isEqualTo(0);
+        assertThat(secondStock.getQuantity()).isEqualTo(2);
+        verify(stockRepository).save(firstStock);
+        verify(stockRepository).save(secondStock);
+    }
+
+    @Test
+    void createOrder_throwsBeforePersistence_whenStrategyReturnsInsufficientCandidates() {
+        UUID productId = UUID.randomUUID();
+        Product product = product(productId);
+        Stock stock = stock(product, location(), 2);
+        Order order = order(UUID.randomUUID(), orderDetail(product, 5));
+
+        when(userRepository.findByEmail("customer@example.com"))
+                .thenReturn(Optional.of(User.builder().email("customer@example.com").build()));
+        when(orderStrategy.findStocks(anySet())).thenReturn(List.of(stock));
+
+        assertThatThrownBy(() -> orderService.createOrder(order, "customer@example.com"))
+                .isInstanceOf(msg.onlineshopapi.exception.OrderNotProcessableException.class)
+                .hasMessageContaining(productId.toString());
+        verifyNoInteractions(orderRepository, stockRepository);
+    }
+
+    @Test
     void createOrder_mergesQuantities_whenOrderContainsDuplicateProducts() {
         UUID orderId = UUID.randomUUID();
         UUID productId = UUID.randomUUID();

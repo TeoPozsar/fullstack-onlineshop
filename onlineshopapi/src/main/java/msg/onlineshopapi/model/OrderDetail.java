@@ -26,6 +26,7 @@ public class OrderDetail {
     private Product product;
 
     @ManyToOne
+    @MapsId("locationId")
     @JoinColumn(name = "shipped_from_id", nullable = false)
     private Location shippedFrom;
 

@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -35,9 +36,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -71,7 +75,7 @@ class OrderServiceTest {
     @Autowired
     private LocationRepository locationRepository;
 
-    @Autowired
+    @MockitoSpyBean
     private StockRepository stockRepository;
 
     @Autowired
@@ -284,5 +288,81 @@ class OrderServiceTest {
         Stock unchangedKeyboardStock = stockRepository.findById(keyboardStockId).orElseThrow();
         assertThat(unchangedLaptopStock.getQuantity()).isEqualTo(10);
         assertThat(unchangedKeyboardStock.getQuantity()).isEqualTo(1);
+    }
+
+    @Test
+    void orderDetails_allowSameProductFromDifferentLocations_butRejectTrueDuplicate() {
+        Location secondLocation = new Location();
+        secondLocation.setName("Warehouse B");
+        secondLocation = locationRepository.save(secondLocation);
+
+        Order order = orderRepository.save(Order.builder().user(user).build());
+        OrderDetail first = orderDetail(order, location, 2);
+        OrderDetail second = orderDetail(order, secondLocation, 1);
+
+        orderDetailRepository.save(first);
+        orderDetailRepository.save(second);
+
+        assertThat(orderDetailRepository.findAll()).hasSize(2);
+        OrderDetail duplicate = orderDetail(order, secondLocation, 4);
+        assertThatThrownBy(() -> orderDetailRepository.saveAndFlush(duplicate))
+                .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void createOrder_rollsBackEarlierStockWrites_whenLaterDeductionFails() {
+        ProductCategory category = productCategoryRepository.findAll().getFirst();
+        Product mouse = productRepository.save(Product.builder()
+                .name("Mouse")
+                .price(BigDecimal.valueOf(29.99))
+                .category(category)
+                .supplier(supplier)
+                .build());
+        StockId mouseStockId = new StockId(mouse.getId(), location.getId());
+        stockRepository.save(Stock.builder()
+                .id(stockId)
+                .product(laptop)
+                .location(location)
+                .quantity(10)
+                .build());
+        stockRepository.save(Stock.builder()
+                .id(mouseStockId)
+                .product(mouse)
+                .location(location)
+                .quantity(5)
+                .build());
+
+        AtomicInteger saves = new AtomicInteger();
+        doAnswer(invocation -> {
+            if (saves.incrementAndGet() == 2) {
+                throw new IllegalStateException("simulated deduction failure");
+            }
+            return invocation.callRealMethod();
+        }).when(stockRepository).save(any(Stock.class));
+
+        Order order = Order.builder()
+                .orderDetails(new HashSet<>(Set.of(
+                        OrderDetail.builder().product(laptop).quantity(2).build(),
+                        OrderDetail.builder().product(mouse).quantity(3).build())))
+                .build();
+
+        assertThatThrownBy(() -> orderService.createOrder(order, user.getEmail()))
+                .isInstanceOf(IllegalStateException.class);
+
+        assertThat(orderRepository.findById(order.getId())).isEmpty();
+        assertThat(orderDetailRepository.findAll()).isEmpty();
+        assertThat(stockRepository.findById(stockId).orElseThrow().getQuantity()).isEqualTo(10);
+        assertThat(stockRepository.findById(mouseStockId).orElseThrow().getQuantity()).isEqualTo(5);
+    }
+
+    private OrderDetail orderDetail(Order order, Location shippedFrom, int quantity) {
+        return OrderDetail.builder()
+                .id(new msg.onlineshopapi.model.OrderDetailId(
+                        order.getId(), laptop.getId(), shippedFrom.getId()))
+                .order(order)
+                .product(laptop)
+                .shippedFrom(shippedFrom)
+                .quantity(quantity)
+                .build();
     }
 }

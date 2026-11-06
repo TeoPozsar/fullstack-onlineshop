@@ -2,6 +2,7 @@ package msg.onlineshopapi.service;
 
 import lombok.RequiredArgsConstructor;
 import msg.onlineshopapi.exception.ResourceNotFoundException;
+import msg.onlineshopapi.exception.OrderNotProcessableException;
 import msg.onlineshopapi.model.*;
 import msg.onlineshopapi.repository.OrderRepository;
 import msg.onlineshopapi.repository.StockRepository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -20,6 +22,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
+
+    private record StockAllocation(Stock stock, int quantity) {
+    }
 
     private final OrderRepository orderRepository;
     private final StockRepository stockRepository;
@@ -42,12 +47,13 @@ public class OrderService {
                 .collect(Collectors.toMap(d -> d.getProduct().getId(), OrderDetail::getQuantity));
 
         List<Stock> stocks = orderStrategy.findStocks(orderDetails);
+        List<StockAllocation> allocations = allocateStocks(stocks, quantityByProduct);
 
         order.getOrderDetails().clear();
         orderRepository.save(order);
 
-        order.getOrderDetails().addAll(buildOrderDetails(order, stocks, quantityByProduct));
-        deductStock(stocks, quantityByProduct);
+        order.getOrderDetails().addAll(buildOrderDetails(order, allocations));
+        deductStock(allocations);
         return orderRepository.save(order);
     }
 
@@ -72,24 +78,59 @@ public class OrderService {
         order.setUser(user);
     }
 
-    private Set<OrderDetail> buildOrderDetails(Order order, List<Stock> stocks, Map<UUID, Integer> quantityByProduct) {
-        return stocks.stream()
-                .map(stock -> {
-                    int quantity = quantityByProduct.get(stock.getProduct().getId());
+    private List<StockAllocation> allocateStocks(List<Stock> stocks, Map<UUID, Integer> quantityByProduct) {
+        Map<UUID, List<Stock>> stocksByProduct = stocks.stream()
+                .collect(Collectors.groupingBy(
+                        stock -> stock.getProduct().getId(),
+                        LinkedHashMap::new,
+                        Collectors.toList()));
+        List<StockAllocation> allocations = new java.util.ArrayList<>();
+
+        for (Map.Entry<UUID, Integer> entry : quantityByProduct.entrySet()) {
+            UUID productId = entry.getKey();
+            int remaining = entry.getValue();
+            for (Stock stock : stocksByProduct.getOrDefault(productId, List.of())) {
+                if (!productId.equals(stock.getProduct().getId())) {
+                    throw new IllegalStateException("Stock does not belong to requested product: " + productId);
+                }
+                if (stock.getQuantity() <= 0) {
+                    continue;
+                }
+                int allocated = Math.min(remaining, stock.getQuantity());
+                allocations.add(new StockAllocation(stock, allocated));
+                remaining -= allocated;
+                if (remaining <= 0) {
+                    break;
+                }
+            }
+            if (remaining > 0) {
+                throw new OrderNotProcessableException(
+                        "Insufficient total stock for product: " + productId);
+            }
+        }
+        return allocations;
+    }
+
+    private Set<OrderDetail> buildOrderDetails(Order order, List<StockAllocation> allocations) {
+        return allocations.stream()
+                .map(allocation -> {
+                    Stock stock = allocation.stock();
                     return OrderDetail.builder()
-                            .id(new OrderDetailId(order.getId(), stock.getProduct().getId()))
+                            .id(new OrderDetailId(order.getId(), stock.getProduct().getId(),
+                                    stock.getLocation().getId()))
                             .order(order)
                             .product(stock.getProduct())
                             .shippedFrom(stock.getLocation())
-                            .quantity(quantity)
+                            .quantity(allocation.quantity())
                             .build();
                 })
                 .collect(Collectors.toSet());
     }
 
-    private void deductStock(List<Stock> stocks, Map<UUID, Integer> quantityByProduct) {
-        for (Stock stock : stocks) {
-            stock.setQuantity(stock.getQuantity() - quantityByProduct.get(stock.getProduct().getId()));
+    private void deductStock(List<StockAllocation> allocations) {
+        for (StockAllocation allocation : allocations) {
+            Stock stock = allocation.stock();
+            stock.setQuantity(stock.getQuantity() - allocation.quantity());
             stockRepository.save(stock);
         }
     }
