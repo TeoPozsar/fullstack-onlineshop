@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, effect, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
 import { CardComponent } from '../../../../../clib/components/card/card.component';
@@ -26,10 +26,12 @@ export class ProductCreatePageComponent implements OnInit {
     readonly form = createProductForm();
     readonly categories = this.productStore.categories;
     readonly suppliers = this.supplierService.suppliers;
-    readonly loading = this.productStore.loading;
+    readonly categoryLoading = this.productStore.categoryLoading;
+    readonly categoryError = this.productStore.categoryError;
     readonly supplierLoading = this.supplierService.loading;
     readonly supplierError = this.supplierService.error;
-    readonly isSubmitting = signal(false);
+    readonly isSubmitting = this.productStore.mutationLoading;
+    readonly mutationError = this.productStore.mutationError;
 
     constructor() {
         effect(() => {
@@ -64,13 +66,11 @@ export class ProductCreatePageComponent implements OnInit {
             supplierId: formValue.supplierId
         };
 
-        this.isSubmitting.set(true);
         this.productStore
             .create(productData)
             .pipe(take(1))
             .subscribe({
                 next: () => {
-                    this.isSubmitting.set(false);
                     this.notificationsService.notifySuccess({
                         title: 'Product created',
                         message: 'Your new product is now available.'
@@ -85,7 +85,6 @@ export class ProductCreatePageComponent implements OnInit {
                         title: 'Create failed',
                         message: 'Unable to create the product.'
                     });
-                    this.isSubmitting.set(false);
                 }
             });
     }
@@ -98,5 +97,9 @@ export class ProductCreatePageComponent implements OnInit {
 
     retrySuppliers(): void {
         this.supplierService.loadAll().pipe(take(1)).subscribe();
+    }
+
+    retryCategories(): void {
+        this.productStore.loadCategories().pipe(take(1)).subscribe();
     }
 }

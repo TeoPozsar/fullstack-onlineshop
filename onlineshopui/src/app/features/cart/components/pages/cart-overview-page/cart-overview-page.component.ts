@@ -1,10 +1,4 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    OnInit,
-    computed,
-    inject
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { take } from 'rxjs';
@@ -45,6 +39,8 @@ export class CartOverviewPageComponent implements OnInit {
     private readonly notificationsService = inject(NotificationsService);
 
     readonly cartItems = this.cartStore.items;
+    readonly cartLoading = this.cartStore.loading;
+    readonly cartError = this.cartStore.error;
     readonly products = this.productStore.products;
     readonly loading = this.productStore.loading;
     readonly error = this.productStore.error;
@@ -119,5 +115,9 @@ export class CartOverviewPageComponent implements OnInit {
 
     retry(): void {
         this.productStore.loadAll().pipe(take(1)).subscribe();
+    }
+
+    retryCart(): void {
+        this.cartStore.restore();
     }
 }

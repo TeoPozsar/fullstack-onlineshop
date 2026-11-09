@@ -28,11 +28,14 @@ export class ProductUpdatePageComponent implements OnInit {
     readonly product = this.productStore.selectedProduct;
     readonly categories = this.productStore.categories;
     readonly suppliers = this.supplierService.suppliers;
-    readonly loading = this.productStore.loading;
-    readonly error = this.productStore.error;
+    readonly loading = this.productStore.detailLoading;
+    readonly error = this.productStore.detailError;
+    readonly categoryLoading = this.productStore.categoryLoading;
+    readonly categoryError = this.productStore.categoryError;
     readonly supplierLoading = this.supplierService.loading;
     readonly supplierError = this.supplierService.error;
-    readonly isSubmitting = signal(false);
+    readonly isSubmitting = this.productStore.mutationLoading;
+    readonly mutationError = this.productStore.mutationError;
     private readonly productId = signal<string | null>(null);
 
     constructor() {
@@ -95,13 +98,11 @@ export class ProductUpdatePageComponent implements OnInit {
             supplierId: formValue.supplierId
         };
 
-        this.isSubmitting.set(true);
         this.productStore
             .update(id, productData)
             .pipe(take(1))
             .subscribe({
                 next: () => {
-                    this.isSubmitting.set(false);
                     this.notificationsService.notifySuccess({
                         title: 'Product updated',
                         message: 'Changes have been saved.'
@@ -116,7 +117,6 @@ export class ProductUpdatePageComponent implements OnInit {
                         title: 'Update failed',
                         message: 'Unable to save changes.'
                     });
-                    this.isSubmitting.set(false);
                 }
             });
     }
@@ -138,5 +138,9 @@ export class ProductUpdatePageComponent implements OnInit {
 
     retrySuppliers(): void {
         this.supplierService.loadAll().pipe(take(1)).subscribe();
+    }
+
+    retryCategories(): void {
+        this.productStore.loadCategories().pipe(take(1)).subscribe();
     }
 }

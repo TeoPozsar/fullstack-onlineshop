@@ -19,6 +19,7 @@ describe('ProductCatalogPageComponent', () => {
         products: ReturnType<typeof signal>;
         loading: ReturnType<typeof signal>;
         error: ReturnType<typeof signal>;
+        mutationLoading: ReturnType<typeof signal>;
         loadAll: ReturnType<typeof vi.fn>;
         delete: ReturnType<typeof vi.fn>;
     };
@@ -41,6 +42,7 @@ describe('ProductCatalogPageComponent', () => {
             products: signal([...MOCK_PRODUCTS]),
             loading: signal(false),
             error: signal(null),
+            mutationLoading: signal(false),
             loadAll: vi.fn().mockReturnValue(of(MOCK_PRODUCTS)),
             delete: vi.fn().mockReturnValue(of(void 0))
         };

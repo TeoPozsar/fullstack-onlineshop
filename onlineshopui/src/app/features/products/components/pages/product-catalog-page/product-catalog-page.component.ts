@@ -40,7 +40,7 @@ export class ProductCatalogPageComponent implements OnInit {
 
     readonly showDeleteModal = signal(false);
     readonly productToDelete = signal<string | null>(null);
-    readonly isDeleting = signal(false);
+    readonly isDeleting = this.productStore.mutationLoading;
     readonly UserRole = UserRole;
 
     ngOnInit(): void {
@@ -77,19 +77,16 @@ export class ProductCatalogPageComponent implements OnInit {
         const productId = this.productToDelete();
         if (!productId) return;
 
-        this.isDeleting.set(true);
         this.productStore
             .delete(productId)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
                 next: () => {
-                    this.isDeleting.set(false);
                     this.showDeleteModal.set(false);
                     this.productToDelete.set(null);
                     this.loadProducts();
                 },
                 error: (err: HttpErrorResponse) => {
-                    this.isDeleting.set(false);
                     this.showDeleteModal.set(false);
                     this.productToDelete.set(null);
                     this.notificationsService.notifyError({

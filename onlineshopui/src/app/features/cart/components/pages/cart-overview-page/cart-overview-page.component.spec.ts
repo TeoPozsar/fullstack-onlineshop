@@ -27,6 +27,9 @@ describe('CartOverviewPageComponent', () => {
     let cartStoreMock: {
         items: ReturnType<typeof signal>;
         totalItems: ReturnType<typeof signal>;
+        loading: ReturnType<typeof signal>;
+        error: ReturnType<typeof signal>;
+        restore: ReturnType<typeof vi.fn>;
         updateQuantity: ReturnType<typeof vi.fn>;
         removeItem: ReturnType<typeof vi.fn>;
         clear: ReturnType<typeof vi.fn>;
@@ -56,6 +59,9 @@ describe('CartOverviewPageComponent', () => {
         cartStoreMock = {
             items: signal([...MOCK_CART_ITEMS]),
             totalItems: signal(3),
+            loading: signal(false),
+            error: signal(null),
+            restore: vi.fn(),
             updateQuantity: vi.fn(),
             removeItem: vi.fn(),
             clear: vi.fn()
@@ -258,6 +264,14 @@ describe('CartOverviewPageComponent', () => {
 
             // Verify
             expect(productServiceMock.loadAll).toHaveBeenCalled();
+        });
+    });
+
+    describe('retryCart()', () => {
+        it('should restore cart state', () => {
+            component.retryCart();
+
+            expect(cartStoreMock.restore).toHaveBeenCalled();
         });
     });
 

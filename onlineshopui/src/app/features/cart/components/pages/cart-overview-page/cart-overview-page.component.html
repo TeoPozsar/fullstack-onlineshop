@@ -11,6 +11,10 @@
             <app-spinner [overlay]="true" />
         }
 
+        @if (cartLoading()) {
+            <app-spinner [overlay]="true" />
+        }
+
         @if (error() && !loading()) {
             <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
                 <p class="text-red-800 mb-4">{{ error() }}</p>
@@ -23,7 +27,19 @@
             </div>
         }
 
-        @if (!loading() && !error() && cartItems().length === 0) {
+        @if (cartError() && !cartLoading()) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                <p class="text-red-800 mb-4">{{ cartError() }}</p>
+                <button
+                    (click)="retryCart()"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                >
+                    Try Again
+                </button>
+            </div>
+        }
+
+        @if (!loading() && !cartLoading() && !error() && !cartError() && cartItems().length === 0) {
             <div class="text-center py-16">
                 <p class="text-text-muted text-lg">Your cart is empty.</p>
                 <a
@@ -35,7 +51,7 @@
             </div>
         }
 
-        @if (!loading() && !error() && cartItems().length > 0) {
+        @if (!loading() && !cartLoading() && !error() && !cartError() && cartItems().length > 0) {
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-4">
                     @for (item of cartItems(); track item.productId) {

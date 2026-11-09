@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { take } from 'rxjs';
@@ -15,22 +15,20 @@ import { ErrorMessageComponent } from '../../../../clib/components/error-message
 })
 export class RegisterPageComponent {
     private readonly authStore = inject(AuthStore);
-    readonly isSubmitting = signal(false);
-    readonly errorMessage = signal<string | null>(null);
+    readonly isSubmitting = this.authStore.loading;
+    readonly errorMessage = computed(() =>
+        this.authStore.error() ? 'Unable to create account. Please try again.' : null
+    );
 
     readonly form = createRegisterForm();
 
     readonly loginLink = ['/', AppNavRoutes.Auth.root, AppNavRoutes.Auth.features.login];
 
     onSubmit() {
-        this.errorMessage.set(null);
-
         if (this.form.invalid || this.isSubmitting()) {
             this.form.markAllAsTouched();
             return;
         }
-
-        this.isSubmitting.set(true);
 
         const payload = this.form.getRawValue();
 
@@ -38,13 +36,8 @@ export class RegisterPageComponent {
             .register(payload)
             .pipe(take(1))
             .subscribe({
-                next: () => {
-                    this.isSubmitting.set(false);
-                },
-                error: () => {
-                    this.isSubmitting.set(false);
-                    this.errorMessage.set('Unable to create account. Please try again.');
-                }
+                next: () => undefined,
+                error: error => console.error('Registration failed:', error)
             });
     }
 }

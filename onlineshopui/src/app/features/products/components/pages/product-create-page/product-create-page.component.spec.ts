@@ -21,7 +21,10 @@ describe('ProductCreatePageComponent', () => {
     let fixture: ComponentFixture<ProductCreatePageComponent>;
     let productServiceMock: {
         categories: ReturnType<typeof signal>;
-        loading: ReturnType<typeof signal>;
+        categoryLoading: ReturnType<typeof signal>;
+        categoryError: ReturnType<typeof signal>;
+        mutationLoading: ReturnType<typeof signal>;
+        mutationError: ReturnType<typeof signal>;
         loadCategories: ReturnType<typeof vi.fn>;
         create: ReturnType<typeof vi.fn>;
     };
@@ -45,7 +48,10 @@ describe('ProductCreatePageComponent', () => {
         consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         productServiceMock = {
             categories: signal([...MOCK_CATEGORIES]),
-            loading: signal(false),
+            categoryLoading: signal(false),
+            categoryError: signal(null),
+            mutationLoading: signal(false),
+            mutationError: signal(null),
             loadCategories: vi.fn().mockReturnValue(of(MOCK_CATEGORIES)),
             create: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0]))
         };
@@ -226,7 +232,7 @@ describe('ProductCreatePageComponent', () => {
             expect(component.form.enabled).toBe(true);
 
             // Action
-            component.isSubmitting.set(true);
+            productServiceMock.mutationLoading.set(true);
             fixture.detectChanges();
 
             // Verify
