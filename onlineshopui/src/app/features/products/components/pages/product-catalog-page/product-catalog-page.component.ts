@@ -13,7 +13,7 @@ import { ProductCardComponent } from '../../views/product-card/product-card.comp
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { ModalComponent } from '../../../../../clib/components/modal/modal.component';
 import { ProductStore } from '../../../store/product.store';
-import { CartService } from '../../../../cart/services/cart.service';
+import { CartStore } from '../../../../cart/store/cart.store';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { HasRoleDirective } from '../../../../auth/directives/has-role.directive';
@@ -29,7 +29,7 @@ import { take } from 'rxjs';
 })
 export class ProductCatalogPageComponent implements OnInit {
     private readonly productStore = inject(ProductStore);
-    private readonly cartService = inject(CartService);
+    private readonly cartStore = inject(CartStore);
     private readonly router = inject(Router);
     private readonly destroyRef = inject(DestroyRef);
     private readonly notificationsService = inject(NotificationsService);
@@ -52,7 +52,7 @@ export class ProductCatalogPageComponent implements OnInit {
     }
 
     onAddToCart(productId: string): void {
-        this.cartService.addItem(productId, 1);
+        this.cartStore.addItem(productId, 1);
         const product = this.products().find(item => item.id === productId);
         const name = product?.name ?? 'Product';
         this.notificationsService.notifySuccess({

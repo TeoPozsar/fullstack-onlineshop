@@ -11,7 +11,7 @@ import { CardComponent } from '../../../../../clib/components/card/card.componen
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { IconComponent } from '../../../../../clib/components/icon/icon.component';
 import { ProductStore } from '../../../store/product.store';
-import { CartService } from '../../../../cart/services/cart.service';
+import { CartStore } from '../../../../cart/store/cart.store';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { take } from 'rxjs';
@@ -25,7 +25,7 @@ import { take } from 'rxjs';
 })
 export class ProductDetailPageComponent implements OnInit {
     private readonly productStore = inject(ProductStore);
-    private readonly cartService = inject(CartService);
+    private readonly cartStore = inject(CartStore);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
@@ -72,7 +72,7 @@ export class ProductDetailPageComponent implements OnInit {
     onAddToCart(): void {
         const prod = this.product();
         if (prod) {
-            this.cartService.addItem(prod.id, this.quantity());
+            this.cartStore.addItem(prod.id, this.quantity());
             this.notificationsService.notifySuccess({
                 title: 'Added to cart',
                 message: `${prod.name} was added to your cart.`

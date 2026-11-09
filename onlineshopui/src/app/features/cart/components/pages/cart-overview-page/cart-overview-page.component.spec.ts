@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { CartOverviewPageComponent } from './cart-overview-page.component';
-import { CartService } from '../../../services/cart.service';
+import { CartStore } from '../../../store/cart.store';
 import { ProductStore } from '../../../../products/store/product.store';
 import { OrdersService } from '../../../../orders/services/orders.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
@@ -24,7 +24,7 @@ const checkoutAddress = {
 describe('CartOverviewPageComponent', () => {
     let component: CartOverviewPageComponent;
     let fixture: ComponentFixture<CartOverviewPageComponent>;
-    let cartServiceMock: {
+    let cartStoreMock: {
         items: ReturnType<typeof signal>;
         totalItems: ReturnType<typeof signal>;
         updateQuantity: ReturnType<typeof vi.fn>;
@@ -52,7 +52,7 @@ describe('CartOverviewPageComponent', () => {
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
         consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-        cartServiceMock = {
+        cartStoreMock = {
             items: signal([...MOCK_CART_ITEMS]),
             totalItems: signal(3),
             updateQuantity: vi.fn(),
@@ -83,7 +83,7 @@ describe('CartOverviewPageComponent', () => {
         TestBed.configureTestingModule({
             imports: [CartOverviewPageComponent],
             providers: [
-                { provide: CartService, useValue: cartServiceMock },
+                { provide: CartStore, useValue: cartStoreMock },
                 { provide: ProductStore, useValue: productServiceMock },
                 { provide: OrdersService, useValue: ordersServiceMock },
                 { provide: Router, useValue: routerMock },
@@ -145,7 +145,7 @@ describe('CartOverviewPageComponent', () => {
             component.onQuantityChange(productId, quantity);
 
             // Verify
-            expect(cartServiceMock.updateQuantity).toHaveBeenCalledWith(productId, quantity);
+            expect(cartStoreMock.updateQuantity).toHaveBeenCalledWith(productId, quantity);
         });
     });
 
@@ -158,7 +158,7 @@ describe('CartOverviewPageComponent', () => {
             component.onRemoveItem(productId);
 
             // Verify
-            expect(cartServiceMock.removeItem).toHaveBeenCalledWith(productId);
+            expect(cartStoreMock.removeItem).toHaveBeenCalledWith(productId);
         });
     });
 
@@ -171,14 +171,14 @@ describe('CartOverviewPageComponent', () => {
             component.onClearCart();
 
             // Verify
-            expect(cartServiceMock.clear).toHaveBeenCalled();
+            expect(cartStoreMock.clear).toHaveBeenCalled();
         });
     });
 
     describe('onCheckout()', () => {
         it('should not proceed when cart is empty', () => {
             // Prepare
-            cartServiceMock.items.set([]);
+            cartStoreMock.items.set([]);
 
             // Action
             component.onCheckout();
@@ -220,7 +220,7 @@ describe('CartOverviewPageComponent', () => {
             expect(ordersServiceMock.create).toHaveBeenCalledWith(
                 expect.objectContaining({ address: checkoutAddress })
             );
-            expect(cartServiceMock.clear).toHaveBeenCalled();
+            expect(cartStoreMock.clear).toHaveBeenCalled();
             expect(notificationsServiceMock.notifySuccess).toHaveBeenCalledWith({
                 title: 'Order placed',
                 message: 'Your order is being processed.'

@@ -24,11 +24,11 @@
 
 ## 4. Cart state
 
-- [ ] 4.1 Implement `CartStore` with `withState`, explicit items/loading/error state, browser-safe `cart_state` hydration, exact `{ items: [...] }` serialization, and invalid-entry filtering; verify store tests cover valid, malformed, invalid, and non-browser storage cases.
-- [ ] 4.2 Implement synchronous cart add, quantity, remove, and clear methods plus `withComputed` item-count derivation; verify tests cover quantity rules, totals, immediate persistence after every mutation, and safe defaults.
-- [ ] 4.3 Migrate product add-to-cart handlers and `CartOverviewPageComponent` to `CartStore`; verify cart component and utility tests preserve product-price subtotal and order-payload behavior.
-- [ ] 4.4 Integrate `CartStore` with the checkout success path while retaining `OrderStore` as the order boundary; verify failed order creation leaves cart items and persisted `cart_state` unchanged and successful creation clears them.
-- [ ] 4.5 Convert `CartService` to a delegating facade or remove it only if no consumer remains; verify it owns no independent cart signals and the complete cart regression gate passes.
+- [x] 4.1 Implement `CartStore` with `withState`, explicit items/loading/error state, browser-safe `cart_state` hydration, exact `{ items: [...] }` serialization, and invalid-entry filtering; verify store tests cover valid, malformed, invalid, and non-browser storage cases.
+- [x] 4.2 Implement synchronous cart add, quantity, remove, and clear methods plus `withComputed` item-count derivation; verify tests cover quantity rules, totals, immediate persistence after every mutation, and safe defaults.
+- [x] 4.3 Migrate product add-to-cart handlers and `CartOverviewPageComponent` to `CartStore`; verify cart component and utility tests preserve product-price subtotal and order-payload behavior.
+- [x] 4.4 Integrate `CartStore` with the checkout success path while retaining the existing `OrdersService` as the order boundary until OrderStore migration; verify failed order creation leaves cart items and persisted `cart_state` unchanged and successful creation clears them.
+- [x] 4.5 Convert `CartService` to a delegating facade or remove it only if no consumer remains; verify it owns no independent cart signals and the complete cart regression gate passes.
 
 ## 5. Order state
 

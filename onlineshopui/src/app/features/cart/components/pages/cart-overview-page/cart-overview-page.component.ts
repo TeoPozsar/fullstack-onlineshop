@@ -9,7 +9,7 @@ import {
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { take } from 'rxjs';
-import { CartService } from '../../../services/cart.service';
+import { CartStore } from '../../../store/cart.store';
 import { ProductStore } from '../../../../products/store/product.store';
 import { OrdersService } from '../../../../orders/services/orders.service';
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
@@ -39,13 +39,13 @@ import { createAddressForm } from '../../../utils/address-form.utils';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CartOverviewPageComponent implements OnInit {
-    private readonly cartService = inject(CartService);
+    private readonly cartStore = inject(CartStore);
     private readonly productStore = inject(ProductStore);
     private readonly ordersService = inject(OrdersService);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
 
-    readonly cartItems = this.cartService.items;
+    readonly cartItems = this.cartStore.items;
     readonly products = this.productStore.products;
     readonly loading = this.productStore.loading;
     readonly error = this.productStore.error;
@@ -63,22 +63,22 @@ export class CartOverviewPageComponent implements OnInit {
         calculateCartSubtotal(this.cartItems(), this.productsById())
     );
 
-    readonly itemCount = this.cartService.totalItems;
+    readonly itemCount = this.cartStore.totalItems;
 
     ngOnInit(): void {
         this.productStore.loadAll().pipe(take(1)).subscribe();
     }
 
     onQuantityChange(productId: string, quantity: number): void {
-        this.cartService.updateQuantity(productId, quantity);
+        this.cartStore.updateQuantity(productId, quantity);
     }
 
     onRemoveItem(productId: string): void {
-        this.cartService.removeItem(productId);
+        this.cartStore.removeItem(productId);
     }
 
     onClearCart(): void {
-        this.cartService.clear();
+        this.cartStore.clear();
     }
 
     onCheckout(): void {
@@ -99,7 +99,7 @@ export class CartOverviewPageComponent implements OnInit {
             .subscribe({
                 next: () => {
                     this.isSubmitting.set(false);
-                    this.cartService.clear();
+                    this.cartStore.clear();
                     this.notificationsService.notifySuccess({
                         title: 'Order placed',
                         message: 'Your order is being processed.'

@@ -5,7 +5,7 @@ import { vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ProductCatalogPageComponent } from './product-catalog-page.component';
 import { ProductStore } from '../../../store/product.store';
-import { CartService } from '../../../../cart/services/cart.service';
+import { CartStore } from '../../../../cart/store/cart.store';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
@@ -22,7 +22,7 @@ describe('ProductCatalogPageComponent', () => {
         loadAll: ReturnType<typeof vi.fn>;
         delete: ReturnType<typeof vi.fn>;
     };
-    let cartServiceMock: {
+    let cartStoreMock: {
         addItem: ReturnType<typeof vi.fn>;
     };
     let routerMock: {
@@ -45,7 +45,7 @@ describe('ProductCatalogPageComponent', () => {
             delete: vi.fn().mockReturnValue(of(void 0))
         };
 
-        cartServiceMock = {
+        cartStoreMock = {
             addItem: vi.fn()
         };
 
@@ -62,7 +62,7 @@ describe('ProductCatalogPageComponent', () => {
             imports: [ProductCatalogPageComponent],
             providers: [
                 { provide: ProductStore, useValue: productServiceMock },
-                { provide: CartService, useValue: cartServiceMock },
+                { provide: CartStore, useValue: cartStoreMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
                 { provide: EnvironmentConfig, useValue: MOCK_ENVIRONMENT_CONFIG }
@@ -127,7 +127,7 @@ describe('ProductCatalogPageComponent', () => {
             component.onAddToCart(productId);
 
             // Verify
-            expect(cartServiceMock.addItem).toHaveBeenCalledWith(productId, 1);
+            expect(cartStoreMock.addItem).toHaveBeenCalledWith(productId, 1);
             expect(notificationsServiceMock.notifySuccess).toHaveBeenCalledWith({
                 title: 'Added to cart',
                 message: `${MOCK_PRODUCTS[0].name} was added to your cart.`
@@ -143,7 +143,7 @@ describe('ProductCatalogPageComponent', () => {
             component.onAddToCart(nonExistentId);
 
             // Verify
-            expect(cartServiceMock.addItem).toHaveBeenCalledWith(nonExistentId, 1);
+            expect(cartStoreMock.addItem).toHaveBeenCalledWith(nonExistentId, 1);
             expect(notificationsServiceMock.notifySuccess).toHaveBeenCalledWith({
                 title: 'Added to cart',
                 message: 'Product was added to your cart.'
