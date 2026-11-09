@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
-import { OrdersService } from '../../../services/orders.service';
+import { OrderStore } from '../../../store/order.store';
 import { toOrderSummary } from '../../../utils/order.utils';
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { OrderCardComponent } from '../../views/order-card/order-card.component';
@@ -14,17 +14,17 @@ import { AppNavRoutes } from '../../../../../core/config/constants/navigation.co
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OrdersOverviewPageComponent implements OnInit {
-    private readonly ordersService = inject(OrdersService);
+    private readonly orderStore = inject(OrderStore);
     private readonly router = inject(Router);
 
-    readonly orders = this.ordersService.orders;
-    readonly loading = this.ordersService.loading;
-    readonly error = this.ordersService.error;
+    readonly orders = this.orderStore.orders;
+    readonly loading = this.orderStore.listLoading;
+    readonly error = this.orderStore.listError;
 
     readonly orderSummaries = computed(() => this.orders().map(order => toOrderSummary(order)));
 
     ngOnInit(): void {
-        this.ordersService.loadAll().pipe(take(1)).subscribe();
+        this.orderStore.loadAll().pipe(take(1)).subscribe();
     }
 
     onViewDetails(orderId: string): void {
@@ -37,6 +37,6 @@ export class OrdersOverviewPageComponent implements OnInit {
     }
 
     retry(): void {
-        this.ordersService.loadAll().pipe(take(1)).subscribe();
+        this.orderStore.loadAll().pipe(take(1)).subscribe();
     }
 }

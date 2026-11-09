@@ -5,7 +5,7 @@ import { vi } from 'vitest';
 import { CartOverviewPageComponent } from './cart-overview-page.component';
 import { CartStore } from '../../../store/cart.store';
 import { ProductStore } from '../../../../products/store/product.store';
-import { OrdersService } from '../../../../orders/services/orders.service';
+import { OrderStore } from '../../../../orders/store/order.store';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { MOCK_CART_ITEMS } from '../../../../../core/mocks/data/cart.mock';
 import { MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
@@ -37,8 +37,9 @@ describe('CartOverviewPageComponent', () => {
         error: ReturnType<typeof signal>;
         loadAll: ReturnType<typeof vi.fn>;
     };
-    let ordersServiceMock: {
+    let orderStoreMock: {
         create: ReturnType<typeof vi.fn>;
+        creationLoading: ReturnType<typeof signal>;
     };
     let routerMock: {
         navigate: ReturnType<typeof vi.fn>;
@@ -67,8 +68,9 @@ describe('CartOverviewPageComponent', () => {
             loadAll: vi.fn().mockReturnValue(of(MOCK_PRODUCTS))
         };
 
-        ordersServiceMock = {
-            create: vi.fn().mockReturnValue(of(MOCK_ORDERS[0]))
+        orderStoreMock = {
+            create: vi.fn().mockReturnValue(of(MOCK_ORDERS[0])),
+            creationLoading: signal(false)
         };
 
         routerMock = {
@@ -85,7 +87,7 @@ describe('CartOverviewPageComponent', () => {
             providers: [
                 { provide: CartStore, useValue: cartStoreMock },
                 { provide: ProductStore, useValue: productServiceMock },
-                { provide: OrdersService, useValue: ordersServiceMock },
+                { provide: OrderStore, useValue: orderStoreMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
                 { provide: ValidationMessages, useValue: DefaultValidationMessages }
@@ -184,7 +186,7 @@ describe('CartOverviewPageComponent', () => {
             component.onCheckout();
 
             // Verify
-            expect(ordersServiceMock.create).not.toHaveBeenCalled();
+            expect(orderStoreMock.create).not.toHaveBeenCalled();
         });
 
         it('should not proceed when the address is invalid', () => {
@@ -192,20 +194,20 @@ describe('CartOverviewPageComponent', () => {
             component.onCheckout();
 
             // Verify
-            expect(ordersServiceMock.create).not.toHaveBeenCalled();
+            expect(orderStoreMock.create).not.toHaveBeenCalled();
             expect(component.addressForm.touched).toBe(true);
         });
 
         it('should not proceed while a submission is in progress', () => {
             // Prepare
             component.addressForm.setValue(checkoutAddress);
-            component.isSubmitting.set(true);
+            orderStoreMock.creationLoading.set(true);
 
             // Action
             component.onCheckout();
 
             // Verify
-            expect(ordersServiceMock.create).not.toHaveBeenCalled();
+            expect(orderStoreMock.create).not.toHaveBeenCalled();
         });
 
         it('should create order and navigate to orders on success', () => {
@@ -217,7 +219,7 @@ describe('CartOverviewPageComponent', () => {
             component.onCheckout();
 
             // Verify
-            expect(ordersServiceMock.create).toHaveBeenCalledWith(
+            expect(orderStoreMock.create).toHaveBeenCalledWith(
                 expect.objectContaining({ address: checkoutAddress })
             );
             expect(cartStoreMock.clear).toHaveBeenCalled();
@@ -230,7 +232,7 @@ describe('CartOverviewPageComponent', () => {
 
         it('should handle checkout failure', () => {
             // Prepare
-            ordersServiceMock.create.mockReturnValue(throwError(() => new Error('Failed')));
+            orderStoreMock.create.mockReturnValue(throwError(() => new Error('Failed')));
             fixture.detectChanges();
             component.addressForm.setValue(checkoutAddress);
 

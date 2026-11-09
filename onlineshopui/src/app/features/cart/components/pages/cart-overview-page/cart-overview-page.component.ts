@@ -3,15 +3,14 @@ import {
     Component,
     OnInit,
     computed,
-    inject,
-    signal
+    inject
 } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { take } from 'rxjs';
 import { CartStore } from '../../../store/cart.store';
 import { ProductStore } from '../../../../products/store/product.store';
-import { OrdersService } from '../../../../orders/services/orders.service';
+import { OrderStore } from '../../../../orders/store/order.store';
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { ErrorMessageComponent } from '../../../../../clib/components/error-message/error-message.component';
 import { CartItemRowComponent } from '../../views/cart-item-row/cart-item-row.component';
@@ -41,7 +40,7 @@ import { createAddressForm } from '../../../utils/address-form.utils';
 export class CartOverviewPageComponent implements OnInit {
     private readonly cartStore = inject(CartStore);
     private readonly productStore = inject(ProductStore);
-    private readonly ordersService = inject(OrdersService);
+    private readonly orderStore = inject(OrderStore);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
 
@@ -49,7 +48,7 @@ export class CartOverviewPageComponent implements OnInit {
     readonly products = this.productStore.products;
     readonly loading = this.productStore.loading;
     readonly error = this.productStore.error;
-    readonly isSubmitting = signal(false);
+    readonly isSubmitting = this.orderStore.creationLoading;
     readonly addressForm = createAddressForm();
     readonly productsLink = [
         '/',
@@ -92,13 +91,11 @@ export class CartOverviewPageComponent implements OnInit {
         const payload = toCreateOrderDto(this.cartItems(), this.addressForm.getRawValue());
         if (!payload) return;
 
-        this.isSubmitting.set(true);
-        this.ordersService
+        this.orderStore
             .create(payload)
             .pipe(take(1))
             .subscribe({
                 next: () => {
-                    this.isSubmitting.set(false);
                     this.cartStore.clear();
                     this.notificationsService.notifySuccess({
                         title: 'Order placed',
@@ -116,7 +113,6 @@ export class CartOverviewPageComponent implements OnInit {
                         title: 'Order failed',
                         message: 'Please try again in a moment.'
                     });
-                    this.isSubmitting.set(false);
                 }
             });
     }

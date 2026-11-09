@@ -32,10 +32,10 @@
 
 ## 5. Order state
 
-- [ ] 5.1 Implement `OrderStore` with `withState`, explicit list/detail/creation loading/error state, and reusable `withComputed` derivations where needed; verify store tests cover shared state and independent resource status.
-- [ ] 5.2 Add order list/detail retrieval and creation workflows using selective `rxMethod`; verify tests cover authenticated requests, read fallbacks, selected-record clearing, creation error propagation, successful list prepending, and final status.
-- [ ] 5.3 Migrate order overview/detail pages and checkout to `OrderStore`; verify order component tests, mock-handler tests, request payloads, and auth-header behavior remain compatible.
-- [ ] 5.4 Convert `OrdersService` to a stateless HTTP boundary or delegating facade, or remove it only if no consumer remains; verify it owns no independent order signals and the complete order regression gate passes.
+- [x] 5.1 Implement `OrderStore` with `withState`, explicit list/detail/creation loading/error state, and reusable `withComputed` derivations where needed; verify store tests cover shared state and independent resource status.
+- [x] 5.2 Add order list/detail retrieval and creation workflows using selective `rxMethod`; verify tests cover authenticated requests, read fallbacks, selected-record clearing, creation error propagation, successful list prepending, and final status.
+- [x] 5.3 Migrate order overview/detail pages and checkout to `OrderStore`; verify order component tests, mock-handler tests, request payloads, and auth-header behavior remain compatible.
+- [x] 5.4 Convert `OrdersService` to a stateless HTTP boundary or delegating facade, or remove it only if no consumer remains; verify it owns no independent order signals and the complete order regression gate passes.
 
 ## 6. Cross-feature verification
 
