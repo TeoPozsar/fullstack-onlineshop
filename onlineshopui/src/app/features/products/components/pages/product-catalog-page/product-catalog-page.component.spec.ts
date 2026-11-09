@@ -4,7 +4,7 @@ import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ProductCatalogPageComponent } from './product-catalog-page.component';
-import { ProductService } from '../../../services/product.service';
+import { ProductStore } from '../../../store/product.store';
 import { CartService } from '../../../../cart/services/cart.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
@@ -30,12 +30,13 @@ describe('ProductCatalogPageComponent', () => {
     };
     let notificationsServiceMock: {
         notifySuccess: ReturnType<typeof vi.fn>;
+        notifyError: ReturnType<typeof vi.fn>;
     };
     let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         productServiceMock = {
             products: signal([...MOCK_PRODUCTS]),
             loading: signal(false),
@@ -53,13 +54,14 @@ describe('ProductCatalogPageComponent', () => {
         };
 
         notificationsServiceMock = {
-            notifySuccess: vi.fn()
+            notifySuccess: vi.fn(),
+            notifyError: vi.fn()
         };
 
         TestBed.configureTestingModule({
             imports: [ProductCatalogPageComponent],
             providers: [
-                { provide: ProductService, useValue: productServiceMock },
+                { provide: ProductStore, useValue: productServiceMock },
                 { provide: CartService, useValue: cartServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },

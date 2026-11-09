@@ -4,7 +4,7 @@ import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ProductUpdatePageComponent } from './product-update-page.component';
-import { ProductService } from '../../../services/product.service';
+import { ProductStore } from '../../../store/product.store';
 import { SupplierService } from '../../../services/supplier.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import {
@@ -50,7 +50,7 @@ describe('ProductUpdatePageComponent', () => {
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         productServiceMock = {
             selectedProduct: signal(MOCK_PRODUCTS[0]),
             categories: signal([...MOCK_CATEGORIES]),
@@ -85,7 +85,7 @@ describe('ProductUpdatePageComponent', () => {
         TestBed.configureTestingModule({
             imports: [ProductUpdatePageComponent],
             providers: [
-                { provide: ProductService, useValue: productServiceMock },
+                { provide: ProductStore, useValue: productServiceMock },
                 { provide: SupplierService, useValue: supplierServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: ActivatedRoute, useValue: activatedRouteMock },

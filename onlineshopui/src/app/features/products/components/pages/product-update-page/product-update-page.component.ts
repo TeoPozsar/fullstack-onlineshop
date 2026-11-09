@@ -4,7 +4,7 @@ import { take } from 'rxjs';
 import { CardComponent } from '../../../../../clib/components/card/card.component';
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { ProductFormComponent } from '../../views/product-form/product-form.component';
-import { ProductService } from '../../../services/product.service';
+import { ProductStore } from '../../../store/product.store';
 import { SupplierService } from '../../../services/supplier.service';
 import { createProductForm } from '../../../utils/product-form.utils';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
@@ -18,18 +18,18 @@ import { NotificationsService } from '../../../../../core/services/notifications
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductUpdatePageComponent implements OnInit {
-    private readonly productService = inject(ProductService);
+    private readonly productStore = inject(ProductStore);
     private readonly supplierService = inject(SupplierService);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
 
     readonly form = createProductForm();
-    readonly product = this.productService.selectedProduct;
-    readonly categories = this.productService.categories;
+    readonly product = this.productStore.selectedProduct;
+    readonly categories = this.productStore.categories;
     readonly suppliers = this.supplierService.suppliers;
-    readonly loading = this.productService.loading;
-    readonly error = this.productService.error;
+    readonly loading = this.productStore.loading;
+    readonly error = this.productStore.error;
     readonly supplierLoading = this.supplierService.loading;
     readonly supplierError = this.supplierService.error;
     readonly isSubmitting = signal(false);
@@ -65,8 +65,8 @@ export class ProductUpdatePageComponent implements OnInit {
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
             this.productId.set(id);
-            this.productService.loadById(id).pipe(take(1)).subscribe();
-            this.productService.loadCategories().pipe(take(1)).subscribe();
+            this.productStore.loadById(id).pipe(take(1)).subscribe();
+            this.productStore.loadCategories().pipe(take(1)).subscribe();
             this.supplierService.loadAll().pipe(take(1)).subscribe();
         } else {
             this.router.navigate([
@@ -96,7 +96,7 @@ export class ProductUpdatePageComponent implements OnInit {
         };
 
         this.isSubmitting.set(true);
-        this.productService
+        this.productStore
             .update(id, productData)
             .pipe(take(1))
             .subscribe({
@@ -130,8 +130,8 @@ export class ProductUpdatePageComponent implements OnInit {
     retry(): void {
         const id = this.productId();
         if (id) {
-            this.productService.loadById(id).pipe(take(1)).subscribe();
-            this.productService.loadCategories().pipe(take(1)).subscribe();
+            this.productStore.loadById(id).pipe(take(1)).subscribe();
+            this.productStore.loadCategories().pipe(take(1)).subscribe();
             this.supplierService.loadAll().pipe(take(1)).subscribe();
         }
     }

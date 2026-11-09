@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 import { vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ProductDetailPageComponent } from './product-detail-page.component';
-import { ProductService } from '../../../services/product.service';
+import { ProductStore } from '../../../store/product.store';
 import { CartService } from '../../../../cart/services/cart.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
@@ -63,7 +63,7 @@ describe('ProductDetailPageComponent', () => {
         TestBed.configureTestingModule({
             imports: [ProductDetailPageComponent],
             providers: [
-                { provide: ProductService, useValue: productServiceMock },
+                { provide: ProductStore, useValue: productServiceMock },
                 { provide: CartService, useValue: cartServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: ActivatedRoute, useValue: activatedRouteMock },

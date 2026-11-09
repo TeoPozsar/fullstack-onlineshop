@@ -10,7 +10,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { take } from 'rxjs';
 import { CartService } from '../../../services/cart.service';
-import { ProductService } from '../../../../products/services/product.service';
+import { ProductStore } from '../../../../products/store/product.store';
 import { OrdersService } from '../../../../orders/services/orders.service';
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { ErrorMessageComponent } from '../../../../../clib/components/error-message/error-message.component';
@@ -40,15 +40,15 @@ import { createAddressForm } from '../../../utils/address-form.utils';
 })
 export class CartOverviewPageComponent implements OnInit {
     private readonly cartService = inject(CartService);
-    private readonly productService = inject(ProductService);
+    private readonly productStore = inject(ProductStore);
     private readonly ordersService = inject(OrdersService);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
 
     readonly cartItems = this.cartService.items;
-    readonly products = this.productService.products;
-    readonly loading = this.productService.loading;
-    readonly error = this.productService.error;
+    readonly products = this.productStore.products;
+    readonly loading = this.productStore.loading;
+    readonly error = this.productStore.error;
     readonly isSubmitting = signal(false);
     readonly addressForm = createAddressForm();
     readonly productsLink = [
@@ -66,7 +66,7 @@ export class CartOverviewPageComponent implements OnInit {
     readonly itemCount = this.cartService.totalItems;
 
     ngOnInit(): void {
-        this.productService.loadAll().pipe(take(1)).subscribe();
+        this.productStore.loadAll().pipe(take(1)).subscribe();
     }
 
     onQuantityChange(productId: string, quantity: number): void {
@@ -122,6 +122,6 @@ export class CartOverviewPageComponent implements OnInit {
     }
 
     retry(): void {
-        this.productService.loadAll().pipe(take(1)).subscribe();
+        this.productStore.loadAll().pipe(take(1)).subscribe();
     }
 }

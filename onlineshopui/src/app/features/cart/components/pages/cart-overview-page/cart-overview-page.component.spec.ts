@@ -4,7 +4,7 @@ import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { CartOverviewPageComponent } from './cart-overview-page.component';
 import { CartService } from '../../../services/cart.service';
-import { ProductService } from '../../../../products/services/product.service';
+import { ProductStore } from '../../../../products/store/product.store';
 import { OrdersService } from '../../../../orders/services/orders.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { MOCK_CART_ITEMS } from '../../../../../core/mocks/data/cart.mock';
@@ -51,7 +51,7 @@ describe('CartOverviewPageComponent', () => {
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         cartServiceMock = {
             items: signal([...MOCK_CART_ITEMS]),
             totalItems: signal(3),
@@ -84,7 +84,7 @@ describe('CartOverviewPageComponent', () => {
             imports: [CartOverviewPageComponent],
             providers: [
                 { provide: CartService, useValue: cartServiceMock },
-                { provide: ProductService, useValue: productServiceMock },
+                { provide: ProductStore, useValue: productServiceMock },
                 { provide: OrdersService, useValue: ordersServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },

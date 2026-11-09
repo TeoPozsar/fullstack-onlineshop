@@ -12,7 +12,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ProductCardComponent } from '../../views/product-card/product-card.component';
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { ModalComponent } from '../../../../../clib/components/modal/modal.component';
-import { ProductService } from '../../../services/product.service';
+import { ProductStore } from '../../../store/product.store';
 import { CartService } from '../../../../cart/services/cart.service';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
@@ -28,15 +28,15 @@ import { take } from 'rxjs';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductCatalogPageComponent implements OnInit {
-    private readonly productService = inject(ProductService);
+    private readonly productStore = inject(ProductStore);
     private readonly cartService = inject(CartService);
     private readonly router = inject(Router);
     private readonly destroyRef = inject(DestroyRef);
     private readonly notificationsService = inject(NotificationsService);
 
-    readonly products = this.productService.products;
-    readonly loading = this.productService.loading;
-    readonly error = this.productService.error;
+    readonly products = this.productStore.products;
+    readonly loading = this.productStore.loading;
+    readonly error = this.productStore.error;
 
     readonly showDeleteModal = signal(false);
     readonly productToDelete = signal<string | null>(null);
@@ -78,7 +78,7 @@ export class ProductCatalogPageComponent implements OnInit {
         if (!productId) return;
 
         this.isDeleting.set(true);
-        this.productService
+        this.productStore
             .delete(productId)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
@@ -89,14 +89,16 @@ export class ProductCatalogPageComponent implements OnInit {
                     this.loadProducts();
                 },
                 error: (err: HttpErrorResponse) => {
-                        this.isDeleting.set(false);
-                        this.showDeleteModal.set(false);
-                        this.productToDelete.set(null);
-                        this.notificationsService.notifyError({
-                            title: 'Delete failed',
-                            message: err.error?.error || 'An unexpected error occurred while deleting the product.'
-                        });
-                    }
+                    this.isDeleting.set(false);
+                    this.showDeleteModal.set(false);
+                    this.productToDelete.set(null);
+                    this.notificationsService.notifyError({
+                        title: 'Delete failed',
+                        message:
+                            err.error?.error ||
+                            'An unexpected error occurred while deleting the product.'
+                    });
+                }
             });
     }
 
@@ -110,6 +112,6 @@ export class ProductCatalogPageComponent implements OnInit {
     }
 
     private loadProducts(): void {
-        this.productService.loadAll().pipe(take(1)).subscribe();
+        this.productStore.loadAll().pipe(take(1)).subscribe();
     }
 }
