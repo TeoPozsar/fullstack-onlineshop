@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
-import { OrdersService } from '../../../services/orders.service';
+import { OrderStore } from '../../../store/order.store';
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { CardComponent } from '../../../../../clib/components/card/card.component';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
@@ -22,13 +22,13 @@ import { IconComponent } from '../../../../../clib/components/icon/icon.componen
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OrderDetailPageComponent implements OnInit {
-    private readonly ordersService = inject(OrdersService);
+    private readonly orderStore = inject(OrderStore);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
 
-    readonly order = this.ordersService.selectedOrder;
-    readonly loading = this.ordersService.loading;
-    readonly error = this.ordersService.error;
+    readonly order = this.orderStore.selectedOrder;
+    readonly loading = this.orderStore.detailLoading;
+    readonly error = this.orderStore.detailError;
     readonly orderId = signal<string | null>(null);
 
     readonly totalAmount = computed(() => calculateOrderTotal(this.order()));
@@ -37,7 +37,7 @@ export class OrderDetailPageComponent implements OnInit {
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
             this.orderId.set(id);
-            this.ordersService.loadById(id).pipe(take(1)).subscribe();
+            this.orderStore.loadById(id).pipe(take(1)).subscribe();
         } else {
             this.router.navigate([
                 '/',
@@ -58,6 +58,6 @@ export class OrderDetailPageComponent implements OnInit {
     retry(): void {
         const id = this.orderId();
         if (!id) return;
-        this.ordersService.loadById(id).pipe(take(1)).subscribe();
+        this.orderStore.loadById(id).pipe(take(1)).subscribe();
     }
 }

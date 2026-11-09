@@ -1,17 +1,10 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    OnInit,
-    computed,
-    inject,
-    signal
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { take } from 'rxjs';
-import { CartService } from '../../../services/cart.service';
-import { ProductService } from '../../../../products/services/product.service';
-import { OrdersService } from '../../../../orders/services/orders.service';
+import { CartStore } from '../../../store/cart.store';
+import { ProductStore } from '../../../../products/store/product.store';
+import { OrderStore } from '../../../../orders/store/order.store';
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { ErrorMessageComponent } from '../../../../../clib/components/error-message/error-message.component';
 import { CartItemRowComponent } from '../../views/cart-item-row/cart-item-row.component';
@@ -39,17 +32,19 @@ import { createAddressForm } from '../../../utils/address-form.utils';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CartOverviewPageComponent implements OnInit {
-    private readonly cartService = inject(CartService);
-    private readonly productService = inject(ProductService);
-    private readonly ordersService = inject(OrdersService);
+    private readonly cartStore = inject(CartStore);
+    private readonly productStore = inject(ProductStore);
+    private readonly orderStore = inject(OrderStore);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
 
-    readonly cartItems = this.cartService.items;
-    readonly products = this.productService.products;
-    readonly loading = this.productService.loading;
-    readonly error = this.productService.error;
-    readonly isSubmitting = signal(false);
+    readonly cartItems = this.cartStore.items;
+    readonly cartLoading = this.cartStore.loading;
+    readonly cartError = this.cartStore.error;
+    readonly products = this.productStore.products;
+    readonly loading = this.productStore.loading;
+    readonly error = this.productStore.error;
+    readonly isSubmitting = this.orderStore.creationLoading;
     readonly addressForm = createAddressForm();
     readonly productsLink = [
         '/',
@@ -63,22 +58,22 @@ export class CartOverviewPageComponent implements OnInit {
         calculateCartSubtotal(this.cartItems(), this.productsById())
     );
 
-    readonly itemCount = this.cartService.totalItems;
+    readonly itemCount = this.cartStore.totalItems;
 
     ngOnInit(): void {
-        this.productService.loadAll().pipe(take(1)).subscribe();
+        this.productStore.loadAll().pipe(take(1)).subscribe();
     }
 
     onQuantityChange(productId: string, quantity: number): void {
-        this.cartService.updateQuantity(productId, quantity);
+        this.cartStore.updateQuantity(productId, quantity);
     }
 
     onRemoveItem(productId: string): void {
-        this.cartService.removeItem(productId);
+        this.cartStore.removeItem(productId);
     }
 
     onClearCart(): void {
-        this.cartService.clear();
+        this.cartStore.clear();
     }
 
     onCheckout(): void {
@@ -92,14 +87,12 @@ export class CartOverviewPageComponent implements OnInit {
         const payload = toCreateOrderDto(this.cartItems(), this.addressForm.getRawValue());
         if (!payload) return;
 
-        this.isSubmitting.set(true);
-        this.ordersService
+        this.orderStore
             .create(payload)
             .pipe(take(1))
             .subscribe({
                 next: () => {
-                    this.isSubmitting.set(false);
-                    this.cartService.clear();
+                    this.cartStore.clear();
                     this.notificationsService.notifySuccess({
                         title: 'Order placed',
                         message: 'Your order is being processed.'
@@ -116,12 +109,15 @@ export class CartOverviewPageComponent implements OnInit {
                         title: 'Order failed',
                         message: 'Please try again in a moment.'
                     });
-                    this.isSubmitting.set(false);
                 }
             });
     }
 
     retry(): void {
-        this.productService.loadAll().pipe(take(1)).subscribe();
+        this.productStore.loadAll().pipe(take(1)).subscribe();
+    }
+
+    retryCart(): void {
+        this.cartStore.restore();
     }
 }

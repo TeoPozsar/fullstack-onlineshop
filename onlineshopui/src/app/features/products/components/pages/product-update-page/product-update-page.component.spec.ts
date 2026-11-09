@@ -4,7 +4,7 @@ import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ProductUpdatePageComponent } from './product-update-page.component';
-import { ProductService } from '../../../services/product.service';
+import { ProductStore } from '../../../store/product.store';
 import { SupplierService } from '../../../services/supplier.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import {
@@ -22,8 +22,12 @@ describe('ProductUpdatePageComponent', () => {
     let productServiceMock: {
         selectedProduct: ReturnType<typeof signal>;
         categories: ReturnType<typeof signal>;
-        loading: ReturnType<typeof signal>;
-        error: ReturnType<typeof signal>;
+        detailLoading: ReturnType<typeof signal>;
+        detailError: ReturnType<typeof signal>;
+        categoryLoading: ReturnType<typeof signal>;
+        categoryError: ReturnType<typeof signal>;
+        mutationLoading: ReturnType<typeof signal>;
+        mutationError: ReturnType<typeof signal>;
         loadById: ReturnType<typeof vi.fn>;
         loadCategories: ReturnType<typeof vi.fn>;
         update: ReturnType<typeof vi.fn>;
@@ -50,12 +54,16 @@ describe('ProductUpdatePageComponent', () => {
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         productServiceMock = {
             selectedProduct: signal(MOCK_PRODUCTS[0]),
             categories: signal([...MOCK_CATEGORIES]),
-            loading: signal(false),
-            error: signal(null),
+            detailLoading: signal(false),
+            detailError: signal(null),
+            categoryLoading: signal(false),
+            categoryError: signal(null),
+            mutationLoading: signal(false),
+            mutationError: signal(null),
             loadById: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0])),
             loadCategories: vi.fn().mockReturnValue(of(MOCK_CATEGORIES)),
             update: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0]))
@@ -85,7 +93,7 @@ describe('ProductUpdatePageComponent', () => {
         TestBed.configureTestingModule({
             imports: [ProductUpdatePageComponent],
             providers: [
-                { provide: ProductService, useValue: productServiceMock },
+                { provide: ProductStore, useValue: productServiceMock },
                 { provide: SupplierService, useValue: supplierServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: ActivatedRoute, useValue: activatedRouteMock },
@@ -244,7 +252,7 @@ describe('ProductUpdatePageComponent', () => {
             expect(component.form.enabled).toBe(true);
 
             // Action
-            component.isSubmitting.set(true);
+            productServiceMock.mutationLoading.set(true);
             fixture.detectChanges();
 
             // Verify

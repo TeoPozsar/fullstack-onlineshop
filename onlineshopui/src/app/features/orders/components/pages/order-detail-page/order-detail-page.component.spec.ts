@@ -4,17 +4,17 @@ import { of } from 'rxjs';
 import { vi } from 'vitest';
 import { signal } from '@angular/core';
 import { OrderDetailPageComponent } from './order-detail-page.component';
-import { OrdersService } from '../../../services/orders.service';
+import { OrderStore } from '../../../store/order.store';
 import { MOCK_ORDERS } from '../../../../../core/mocks/data/orders.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 
 describe('OrderDetailPageComponent', () => {
     let component: OrderDetailPageComponent;
     let fixture: ComponentFixture<OrderDetailPageComponent>;
-    let ordersServiceMock: {
+    let orderStoreMock: {
         selectedOrder: ReturnType<typeof signal>;
-        loading: ReturnType<typeof signal>;
-        error: ReturnType<typeof signal>;
+        detailLoading: ReturnType<typeof signal>;
+        detailError: ReturnType<typeof signal>;
         loadById: ReturnType<typeof vi.fn>;
     };
     let routerMock: {
@@ -27,10 +27,10 @@ describe('OrderDetailPageComponent', () => {
     };
 
     beforeEach(() => {
-        ordersServiceMock = {
+        orderStoreMock = {
             selectedOrder: signal(MOCK_ORDERS[0]),
-            loading: signal(false),
-            error: signal(null),
+            detailLoading: signal(false),
+            detailError: signal(null),
             loadById: vi.fn().mockReturnValue(of(MOCK_ORDERS[0]))
         };
 
@@ -47,7 +47,7 @@ describe('OrderDetailPageComponent', () => {
         TestBed.configureTestingModule({
             imports: [OrderDetailPageComponent],
             providers: [
-                { provide: OrdersService, useValue: ordersServiceMock },
+                { provide: OrderStore, useValue: orderStoreMock },
                 { provide: Router, useValue: routerMock },
                 { provide: ActivatedRoute, useValue: activatedRouteMock }
             ]
@@ -77,7 +77,7 @@ describe('OrderDetailPageComponent', () => {
             component.ngOnInit();
 
             // Verify
-            expect(ordersServiceMock.loadById).toHaveBeenCalledWith('order-1');
+            expect(orderStoreMock.loadById).toHaveBeenCalledWith('order-1');
             expect(component.orderId()).toBe('order-1');
         });
 
@@ -118,26 +118,26 @@ describe('OrderDetailPageComponent', () => {
         it('should reload order by id', () => {
             // Prepare
             component.ngOnInit();
-            ordersServiceMock.loadById.mockClear();
+            orderStoreMock.loadById.mockClear();
 
             // Action
             component.retry();
 
             // Verify
-            expect(ordersServiceMock.loadById).toHaveBeenCalledWith('order-1');
+            expect(orderStoreMock.loadById).toHaveBeenCalledWith('order-1');
         });
 
         it('should not reload when no order id', () => {
             // Prepare
             activatedRouteMock.snapshot.paramMap = convertToParamMap({});
             component.ngOnInit();
-            ordersServiceMock.loadById.mockClear();
+            orderStoreMock.loadById.mockClear();
 
             // Action
             component.retry();
 
             // Verify
-            expect(ordersServiceMock.loadById).not.toHaveBeenCalled();
+            expect(orderStoreMock.loadById).not.toHaveBeenCalled();
         });
     });
 
@@ -156,7 +156,7 @@ describe('OrderDetailPageComponent', () => {
 
         it('should render legacy orders without an address', () => {
             // Prepare
-            ordersServiceMock.selectedOrder.set({ ...MOCK_ORDERS[0], address: null });
+            orderStoreMock.selectedOrder.set({ ...MOCK_ORDERS[0], address: null });
 
             // Action
             fixture.detectChanges();

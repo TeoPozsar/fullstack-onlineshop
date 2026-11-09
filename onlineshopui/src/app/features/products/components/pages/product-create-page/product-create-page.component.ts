@@ -1,10 +1,10 @@
-import { Component, OnInit, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, effect, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
 import { CardComponent } from '../../../../../clib/components/card/card.component';
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { ProductFormComponent } from '../../views/product-form/product-form.component';
-import { ProductService } from '../../../services/product.service';
+import { ProductStore } from '../../../store/product.store';
 import { SupplierService } from '../../../services/supplier.service';
 import { createProductForm } from '../../../utils/product-form.utils';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
@@ -18,18 +18,20 @@ import { NotificationsService } from '../../../../../core/services/notifications
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductCreatePageComponent implements OnInit {
-    private readonly productService = inject(ProductService);
+    private readonly productStore = inject(ProductStore);
     private readonly supplierService = inject(SupplierService);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
 
     readonly form = createProductForm();
-    readonly categories = this.productService.categories;
+    readonly categories = this.productStore.categories;
     readonly suppliers = this.supplierService.suppliers;
-    readonly loading = this.productService.loading;
+    readonly categoryLoading = this.productStore.categoryLoading;
+    readonly categoryError = this.productStore.categoryError;
     readonly supplierLoading = this.supplierService.loading;
     readonly supplierError = this.supplierService.error;
-    readonly isSubmitting = signal(false);
+    readonly isSubmitting = this.productStore.mutationLoading;
+    readonly mutationError = this.productStore.mutationError;
 
     constructor() {
         effect(() => {
@@ -43,7 +45,7 @@ export class ProductCreatePageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.productService.loadCategories().pipe(take(1)).subscribe();
+        this.productStore.loadCategories().pipe(take(1)).subscribe();
         this.supplierService.loadAll().pipe(take(1)).subscribe();
     }
 
@@ -64,13 +66,11 @@ export class ProductCreatePageComponent implements OnInit {
             supplierId: formValue.supplierId
         };
 
-        this.isSubmitting.set(true);
-        this.productService
+        this.productStore
             .create(productData)
             .pipe(take(1))
             .subscribe({
                 next: () => {
-                    this.isSubmitting.set(false);
                     this.notificationsService.notifySuccess({
                         title: 'Product created',
                         message: 'Your new product is now available.'
@@ -85,7 +85,6 @@ export class ProductCreatePageComponent implements OnInit {
                         title: 'Create failed',
                         message: 'Unable to create the product.'
                     });
-                    this.isSubmitting.set(false);
                 }
             });
     }
@@ -98,5 +97,9 @@ export class ProductCreatePageComponent implements OnInit {
 
     retrySuppliers(): void {
         this.supplierService.loadAll().pipe(take(1)).subscribe();
+    }
+
+    retryCategories(): void {
+        this.productStore.loadCategories().pipe(take(1)).subscribe();
     }
 }

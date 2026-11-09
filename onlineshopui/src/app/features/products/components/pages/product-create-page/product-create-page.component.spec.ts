@@ -4,7 +4,7 @@ import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ProductCreatePageComponent } from './product-create-page.component';
-import { ProductService } from '../../../services/product.service';
+import { ProductStore } from '../../../store/product.store';
 import { SupplierService } from '../../../services/supplier.service';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import {
@@ -21,7 +21,10 @@ describe('ProductCreatePageComponent', () => {
     let fixture: ComponentFixture<ProductCreatePageComponent>;
     let productServiceMock: {
         categories: ReturnType<typeof signal>;
-        loading: ReturnType<typeof signal>;
+        categoryLoading: ReturnType<typeof signal>;
+        categoryError: ReturnType<typeof signal>;
+        mutationLoading: ReturnType<typeof signal>;
+        mutationError: ReturnType<typeof signal>;
         loadCategories: ReturnType<typeof vi.fn>;
         create: ReturnType<typeof vi.fn>;
     };
@@ -42,10 +45,13 @@ describe('ProductCreatePageComponent', () => {
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         productServiceMock = {
             categories: signal([...MOCK_CATEGORIES]),
-            loading: signal(false),
+            categoryLoading: signal(false),
+            categoryError: signal(null),
+            mutationLoading: signal(false),
+            mutationError: signal(null),
             loadCategories: vi.fn().mockReturnValue(of(MOCK_CATEGORIES)),
             create: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0]))
         };
@@ -68,7 +74,7 @@ describe('ProductCreatePageComponent', () => {
         TestBed.configureTestingModule({
             imports: [ProductCreatePageComponent],
             providers: [
-                { provide: ProductService, useValue: productServiceMock },
+                { provide: ProductStore, useValue: productServiceMock },
                 { provide: SupplierService, useValue: supplierServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
@@ -226,7 +232,7 @@ describe('ProductCreatePageComponent', () => {
             expect(component.form.enabled).toBe(true);
 
             // Action
-            component.isSubmitting.set(true);
+            productServiceMock.mutationLoading.set(true);
             fixture.detectChanges();
 
             // Verify

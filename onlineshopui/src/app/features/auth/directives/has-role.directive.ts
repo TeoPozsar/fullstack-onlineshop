@@ -7,7 +7,7 @@ import {
     TemplateRef,
     ViewContainerRef
 } from '@angular/core';
-import { AuthService } from '../services/auth.service';
+import { AuthStore } from '../store/auth.store';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserRole } from '../../../core/types/enums/user-roles.enum';
 
@@ -17,13 +17,13 @@ import { UserRole } from '../../../core/types/enums/user-roles.enum';
 })
 export class HasRoleDirective implements OnInit {
     guardRole = input.required<UserRole>({ alias: 'appHasRole' });
-    private readonly authService = inject(AuthService);
+    private readonly authStore = inject(AuthStore);
     private readonly templateRef = inject(TemplateRef<unknown>);
     private readonly viewContainer = inject(ViewContainerRef);
     private readonly destroyRef = inject(DestroyRef);
 
     ngOnInit() {
-        this.authService
+        this.authStore
             .loadProfileIfNeeded()
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(currentUser => {
@@ -32,8 +32,7 @@ export class HasRoleDirective implements OnInit {
                     return;
                 }
                 const hasAccess =
-                    this.authService.isAuthenticated() &&
-                    this.authService.hasRole(this.guardRole());
+                    this.authStore.isAuthenticated() && this.authStore.hasRole(this.guardRole());
                 if (hasAccess) {
                     this.viewContainer.createEmbeddedView(this.templateRef);
                 } else {

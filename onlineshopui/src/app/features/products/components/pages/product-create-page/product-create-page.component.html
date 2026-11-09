@@ -7,8 +7,24 @@
         </div>
 
         <!-- Loading State for Categories -->
-        @if (loading() && categories().length === 0) {
+        @if (categoryLoading() && categories().length === 0) {
             <app-spinner [overlay]="true"></app-spinner>
+        }
+
+        @if (categoryError() && !categoryLoading()) {
+            <div
+                class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center"
+                role="alert"
+            >
+                <p class="text-red-800 dark:text-red-200 mb-4">{{ categoryError() }}</p>
+                <button
+                    type="button"
+                    (click)="retryCategories()"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white rounded-md transition-colors"
+                >
+                    Retry category loading
+                </button>
+            </div>
         }
 
         @if (supplierLoading() && suppliers().length === 0) {
@@ -35,8 +51,21 @@
             <p class="mb-4 text-text-muted" role="status">No suppliers are available.</p>
         }
 
+        @if (mutationError() && !isSubmitting()) {
+            <div
+                class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center"
+                role="alert"
+            >
+                <p class="text-red-800 dark:text-red-200">{{ mutationError() }}</p>
+            </div>
+        }
+
         <!-- Form -->
-        @if ((!loading() || categories().length > 0) && suppliers().length > 0) {
+        @if (
+            (!categoryLoading() || categories().length > 0) &&
+            !categoryError() &&
+            suppliers().length > 0
+        ) {
             <app-card>
                 <app-product-form
                     [form]="form"

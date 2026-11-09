@@ -4,8 +4,8 @@ import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ProductCatalogPageComponent } from './product-catalog-page.component';
-import { ProductService } from '../../../services/product.service';
-import { CartService } from '../../../../cart/services/cart.service';
+import { ProductStore } from '../../../store/product.store';
+import { CartStore } from '../../../../cart/store/cart.store';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { MOCK_PRODUCTS } from '../../../../../core/mocks/data/products.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
@@ -19,10 +19,11 @@ describe('ProductCatalogPageComponent', () => {
         products: ReturnType<typeof signal>;
         loading: ReturnType<typeof signal>;
         error: ReturnType<typeof signal>;
+        mutationLoading: ReturnType<typeof signal>;
         loadAll: ReturnType<typeof vi.fn>;
         delete: ReturnType<typeof vi.fn>;
     };
-    let cartServiceMock: {
+    let cartStoreMock: {
         addItem: ReturnType<typeof vi.fn>;
     };
     let routerMock: {
@@ -30,21 +31,23 @@ describe('ProductCatalogPageComponent', () => {
     };
     let notificationsServiceMock: {
         notifySuccess: ReturnType<typeof vi.fn>;
+        notifyError: ReturnType<typeof vi.fn>;
     };
     let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         productServiceMock = {
             products: signal([...MOCK_PRODUCTS]),
             loading: signal(false),
             error: signal(null),
+            mutationLoading: signal(false),
             loadAll: vi.fn().mockReturnValue(of(MOCK_PRODUCTS)),
             delete: vi.fn().mockReturnValue(of(void 0))
         };
 
-        cartServiceMock = {
+        cartStoreMock = {
             addItem: vi.fn()
         };
 
@@ -53,14 +56,15 @@ describe('ProductCatalogPageComponent', () => {
         };
 
         notificationsServiceMock = {
-            notifySuccess: vi.fn()
+            notifySuccess: vi.fn(),
+            notifyError: vi.fn()
         };
 
         TestBed.configureTestingModule({
             imports: [ProductCatalogPageComponent],
             providers: [
-                { provide: ProductService, useValue: productServiceMock },
-                { provide: CartService, useValue: cartServiceMock },
+                { provide: ProductStore, useValue: productServiceMock },
+                { provide: CartStore, useValue: cartStoreMock },
                 { provide: Router, useValue: routerMock },
                 { provide: NotificationsService, useValue: notificationsServiceMock },
                 { provide: EnvironmentConfig, useValue: MOCK_ENVIRONMENT_CONFIG }
@@ -125,7 +129,7 @@ describe('ProductCatalogPageComponent', () => {
             component.onAddToCart(productId);
 
             // Verify
-            expect(cartServiceMock.addItem).toHaveBeenCalledWith(productId, 1);
+            expect(cartStoreMock.addItem).toHaveBeenCalledWith(productId, 1);
             expect(notificationsServiceMock.notifySuccess).toHaveBeenCalledWith({
                 title: 'Added to cart',
                 message: `${MOCK_PRODUCTS[0].name} was added to your cart.`
@@ -141,7 +145,7 @@ describe('ProductCatalogPageComponent', () => {
             component.onAddToCart(nonExistentId);
 
             // Verify
-            expect(cartServiceMock.addItem).toHaveBeenCalledWith(nonExistentId, 1);
+            expect(cartStoreMock.addItem).toHaveBeenCalledWith(nonExistentId, 1);
             expect(notificationsServiceMock.notifySuccess).toHaveBeenCalledWith({
                 title: 'Added to cart',
                 message: 'Product was added to your cart.'

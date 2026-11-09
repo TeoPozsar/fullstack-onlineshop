@@ -4,17 +4,17 @@ import { of } from 'rxjs';
 import { vi } from 'vitest';
 import { signal } from '@angular/core';
 import { OrdersOverviewPageComponent } from './orders-overview-page.component';
-import { OrdersService } from '../../../services/orders.service';
+import { OrderStore } from '../../../store/order.store';
 import { MOCK_ORDERS } from '../../../../../core/mocks/data/orders.mock';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 
 describe('OrdersOverviewPageComponent', () => {
     let component: OrdersOverviewPageComponent;
     let fixture: ComponentFixture<OrdersOverviewPageComponent>;
-    let ordersServiceMock: {
+    let orderStoreMock: {
         orders: ReturnType<typeof signal>;
-        loading: ReturnType<typeof signal>;
-        error: ReturnType<typeof signal>;
+        listLoading: ReturnType<typeof signal>;
+        listError: ReturnType<typeof signal>;
         loadAll: ReturnType<typeof vi.fn>;
     };
     let routerMock: {
@@ -22,10 +22,10 @@ describe('OrdersOverviewPageComponent', () => {
     };
 
     beforeEach(() => {
-        ordersServiceMock = {
+        orderStoreMock = {
             orders: signal([...MOCK_ORDERS]),
-            loading: signal(false),
-            error: signal(null),
+            listLoading: signal(false),
+            listError: signal(null),
             loadAll: vi.fn().mockReturnValue(of(MOCK_ORDERS))
         };
 
@@ -36,7 +36,7 @@ describe('OrdersOverviewPageComponent', () => {
         TestBed.configureTestingModule({
             imports: [OrdersOverviewPageComponent],
             providers: [
-                { provide: OrdersService, useValue: ordersServiceMock },
+                { provide: OrderStore, useValue: orderStoreMock },
                 { provide: Router, useValue: routerMock }
             ]
         });
@@ -65,7 +65,7 @@ describe('OrdersOverviewPageComponent', () => {
             component.ngOnInit();
 
             // Verify
-            expect(ordersServiceMock.loadAll).toHaveBeenCalled();
+            expect(orderStoreMock.loadAll).toHaveBeenCalled();
         });
 
         it('should initialize with orders from service', () => {
@@ -101,13 +101,13 @@ describe('OrdersOverviewPageComponent', () => {
     describe('retry()', () => {
         it('should reload orders', () => {
             // Prepare
-            ordersServiceMock.loadAll.mockClear();
+            orderStoreMock.loadAll.mockClear();
 
             // Action
             component.retry();
 
             // Verify
-            expect(ordersServiceMock.loadAll).toHaveBeenCalled();
+            expect(orderStoreMock.loadAll).toHaveBeenCalled();
         });
     });
 

@@ -12,8 +12,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ProductCardComponent } from '../../views/product-card/product-card.component';
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { ModalComponent } from '../../../../../clib/components/modal/modal.component';
-import { ProductService } from '../../../services/product.service';
-import { CartService } from '../../../../cart/services/cart.service';
+import { ProductStore } from '../../../store/product.store';
+import { CartStore } from '../../../../cart/store/cart.store';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { HasRoleDirective } from '../../../../auth/directives/has-role.directive';
@@ -28,19 +28,19 @@ import { take } from 'rxjs';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductCatalogPageComponent implements OnInit {
-    private readonly productService = inject(ProductService);
-    private readonly cartService = inject(CartService);
+    private readonly productStore = inject(ProductStore);
+    private readonly cartStore = inject(CartStore);
     private readonly router = inject(Router);
     private readonly destroyRef = inject(DestroyRef);
     private readonly notificationsService = inject(NotificationsService);
 
-    readonly products = this.productService.products;
-    readonly loading = this.productService.loading;
-    readonly error = this.productService.error;
+    readonly products = this.productStore.products;
+    readonly loading = this.productStore.loading;
+    readonly error = this.productStore.error;
 
     readonly showDeleteModal = signal(false);
     readonly productToDelete = signal<string | null>(null);
-    readonly isDeleting = signal(false);
+    readonly isDeleting = this.productStore.mutationLoading;
     readonly UserRole = UserRole;
 
     ngOnInit(): void {
@@ -52,7 +52,7 @@ export class ProductCatalogPageComponent implements OnInit {
     }
 
     onAddToCart(productId: string): void {
-        this.cartService.addItem(productId, 1);
+        this.cartStore.addItem(productId, 1);
         const product = this.products().find(item => item.id === productId);
         const name = product?.name ?? 'Product';
         this.notificationsService.notifySuccess({
@@ -77,26 +77,25 @@ export class ProductCatalogPageComponent implements OnInit {
         const productId = this.productToDelete();
         if (!productId) return;
 
-        this.isDeleting.set(true);
-        this.productService
+        this.productStore
             .delete(productId)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
                 next: () => {
-                    this.isDeleting.set(false);
                     this.showDeleteModal.set(false);
                     this.productToDelete.set(null);
                     this.loadProducts();
                 },
                 error: (err: HttpErrorResponse) => {
-                        this.isDeleting.set(false);
-                        this.showDeleteModal.set(false);
-                        this.productToDelete.set(null);
-                        this.notificationsService.notifyError({
-                            title: 'Delete failed',
-                            message: err.error?.error || 'An unexpected error occurred while deleting the product.'
-                        });
-                    }
+                    this.showDeleteModal.set(false);
+                    this.productToDelete.set(null);
+                    this.notificationsService.notifyError({
+                        title: 'Delete failed',
+                        message:
+                            err.error?.error ||
+                            'An unexpected error occurred while deleting the product.'
+                    });
+                }
             });
     }
 
@@ -110,6 +109,6 @@ export class ProductCatalogPageComponent implements OnInit {
     }
 
     private loadProducts(): void {
-        this.productService.loadAll().pipe(take(1)).subscribe();
+        this.productStore.loadAll().pipe(take(1)).subscribe();
     }
 }

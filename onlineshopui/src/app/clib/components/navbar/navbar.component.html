@@ -48,7 +48,7 @@
                 </button>
 
                 <!-- Auth Buttons -->
-                @if (!authService.isAuthenticated()) {
+                @if (!authStore.isAuthenticated()) {
                     <a
                         [routerLink]="loginLink"
                         class="px-4 py-2 text-text hover:text-primary transition-colors"
@@ -131,7 +131,7 @@
                 </div>
 
                 <div class="border-t border-border pt-2 mt-2">
-                    @if (!authService.isAuthenticated()) {
+                    @if (!authStore.isAuthenticated()) {
                         <a
                             [routerLink]="loginLink"
                             (click)="closeMobileMenu()"

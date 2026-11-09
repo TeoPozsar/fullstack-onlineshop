@@ -10,8 +10,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CardComponent } from '../../../../../clib/components/card/card.component';
 import { SpinnerComponent } from '../../../../../clib/components/spinner/spinner.component';
 import { IconComponent } from '../../../../../clib/components/icon/icon.component';
-import { ProductService } from '../../../services/product.service';
-import { CartService } from '../../../../cart/services/cart.service';
+import { ProductStore } from '../../../store/product.store';
+import { CartStore } from '../../../../cart/store/cart.store';
 import { AppNavRoutes } from '../../../../../core/config/constants/navigation.constants';
 import { NotificationsService } from '../../../../../core/services/notifications.service';
 import { take } from 'rxjs';
@@ -24,15 +24,15 @@ import { take } from 'rxjs';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductDetailPageComponent implements OnInit {
-    private readonly productService = inject(ProductService);
-    private readonly cartService = inject(CartService);
+    private readonly productStore = inject(ProductStore);
+    private readonly cartStore = inject(CartStore);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly notificationsService = inject(NotificationsService);
 
-    readonly product = this.productService.selectedProduct;
-    readonly loading = this.productService.loading;
-    readonly error = this.productService.error;
+    readonly product = this.productStore.selectedProduct;
+    readonly loading = this.productStore.loading;
+    readonly error = this.productStore.error;
     readonly quantity = signal(1);
 
     readonly totalPrice = computed(() => {
@@ -44,7 +44,7 @@ export class ProductDetailPageComponent implements OnInit {
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
-            this.productService.loadById(id).pipe(take(1)).subscribe();
+            this.productStore.loadById(id).pipe(take(1)).subscribe();
         } else {
             this.router.navigate([
                 `/${AppNavRoutes.Products.root}/${AppNavRoutes.Products.features.overview}`
@@ -72,7 +72,7 @@ export class ProductDetailPageComponent implements OnInit {
     onAddToCart(): void {
         const prod = this.product();
         if (prod) {
-            this.cartService.addItem(prod.id, this.quantity());
+            this.cartStore.addItem(prod.id, this.quantity());
             this.notificationsService.notifySuccess({
                 title: 'Added to cart',
                 message: `${prod.name} was added to your cart.`
@@ -89,7 +89,7 @@ export class ProductDetailPageComponent implements OnInit {
     retry(): void {
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
-            this.productService.loadById(id).pipe(take(1)).subscribe();
+            this.productStore.loadById(id).pipe(take(1)).subscribe();
         }
     }
 }
