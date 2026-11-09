@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -31,6 +32,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -50,6 +53,9 @@ class ProductControllerTest {
 
     @MockitoBean
     private ProductMapper productMapper;
+
+    @MockitoBean
+    private SimpMessagingTemplate messagingTemplate;
 
     @MockitoBean
     private JwtService jwtService;
@@ -121,6 +127,8 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.id").value(laptopId.toString()))
                 .andExpect(jsonPath("$.name").value("Laptop"))
                 .andExpect(jsonPath("$.supplier.id").value(supplierId.toString()));
+
+        verify(messagingTemplate).convertAndSend(eq("/topic/products"), any(msg.onlineshopapi.dto.ProductEventDto.class));
     }
 
     @Test
@@ -134,6 +142,8 @@ class ProductControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("supplierId: Supplier is required"));
+
+        verify(messagingTemplate, never()).convertAndSend(eq("/topic/products"), any(msg.onlineshopapi.dto.ProductEventDto.class));
     }
 
     @Test
@@ -169,6 +179,8 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Updated Laptop"))
                 .andExpect(jsonPath("$.supplier.id").value(supplierId.toString()));
+
+        verify(messagingTemplate).convertAndSend(eq("/topic/products"), any(msg.onlineshopapi.dto.ProductEventDto.class));
     }
 
     @Test
@@ -182,6 +194,8 @@ class ProductControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("supplierId: Supplier is required"));
+
+        verify(messagingTemplate, never()).convertAndSend(eq("/topic/products"), any(msg.onlineshopapi.dto.ProductEventDto.class));
     }
 
     @Test
@@ -201,6 +215,8 @@ class ProductControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Product not found with id: " + laptopId));
+
+        verify(messagingTemplate, never()).convertAndSend(eq("/topic/products"), any(msg.onlineshopapi.dto.ProductEventDto.class));
     }
 
     @Test
@@ -223,6 +239,8 @@ class ProductControllerTest {
 
         mockMvc.perform(delete("/products/{id}", laptopId))
                 .andExpect(status().isNoContent());
+
+        verify(messagingTemplate).convertAndSend(eq("/topic/products"), any(msg.onlineshopapi.dto.ProductEventDto.class));
     }
 
     @Test
@@ -234,6 +252,8 @@ class ProductControllerTest {
         mockMvc.perform(delete("/products/{id}", laptopId))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value("Cannot delete product 'Laptop' because it is referenced by existing orders."));
+
+        verify(messagingTemplate, never()).convertAndSend(eq("/topic/products"), any(msg.onlineshopapi.dto.ProductEventDto.class));
     }
 
     @Test
@@ -245,6 +265,8 @@ class ProductControllerTest {
         mockMvc.perform(delete("/products/{id}", laptopId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Product not found with id: " + laptopId));
+
+        verify(messagingTemplate, never()).convertAndSend(eq("/topic/products"), any(msg.onlineshopapi.dto.ProductEventDto.class));
     }
 
     @Test

@@ -4,6 +4,7 @@ import {
     inject,
     signal,
     computed,
+    effect,
     ChangeDetectionStrategy
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -34,6 +35,22 @@ export class ProductDetailPageComponent implements OnInit {
     readonly loading = this.productService.loading;
     readonly error = this.productService.error;
     readonly quantity = signal(1);
+
+    constructor() {
+        effect(() => {
+            const routeProductId = this.route.snapshot.paramMap.get('id');
+            if (routeProductId && this.productService.deletedProductId() === routeProductId) {
+                this.notificationsService.notifyInfo({
+                    title: 'Product unavailable',
+                    message: 'This product was deleted and is no longer available.'
+                });
+                this.productService.clearDeletedProductMarker();
+                void this.router.navigate([
+                    `/${AppNavRoutes.Products.root}/${AppNavRoutes.Products.features.overview}`
+                ]);
+            }
+        });
+    }
 
     readonly totalPrice = computed(() => {
         const prod = this.product();

@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
-import { take } from 'rxjs';
+import { Observable, Subject, take } from 'rxjs';
 import { ProductService } from './product.service';
 import { EnvironmentConfig } from '../../../core/types/providers/environment-config';
 import {
@@ -11,12 +11,16 @@ import {
 } from '../../../core/mocks/data/products.mock';
 import { MOCK_ENVIRONMENT_CONFIG } from '../../../core/mocks/data/environment.mock';
 import { ProductDto } from '../../../core/types/dtos/product.dto';
+import { ProductWebSocketService } from './product-websocket.service';
+import { ProductEventDto } from '../../../core/types/dtos/product-event.dto';
 
 describe('ProductService', () => {
     let service: ProductService;
     let httpMock: HttpTestingController;
+    let productEvents: Subject<ProductEventDto>;
 
     beforeEach(() => {
+        productEvents = new Subject<ProductEventDto>();
         TestBed.configureTestingModule({
             providers: [
                 ProductService,
@@ -25,6 +29,12 @@ describe('ProductService', () => {
                 {
                     provide: EnvironmentConfig,
                     useValue: MOCK_ENVIRONMENT_CONFIG
+                },
+                {
+                    provide: ProductWebSocketService,
+                    useValue: {
+                        events: productEvents.asObservable() as Observable<ProductEventDto>
+                    }
                 }
             ]
         });
@@ -644,6 +654,72 @@ describe('ProductService', () => {
 
             // Verify
             expect(service.selectedProduct()).toBeNull();
+        });
+    });
+
+    describe('real-time events', () => {
+        it('should upsert created and updated products without duplicates', () => {
+            const created = { ...MOCK_PRODUCTS[0], id: 'prod-live' };
+            const updated = { ...created, name: 'Updated live product' };
+
+            productEvents.next({
+                eventId: 'event-create',
+                action: 'CREATED',
+                productId: created.id,
+                occurredAt: '2026-11-06T14:00:00.000Z',
+                product: created
+            });
+            productEvents.next({
+                eventId: 'event-create',
+                action: 'CREATED',
+                productId: created.id,
+                occurredAt: '2026-11-06T14:00:00.000Z',
+                product: created
+            });
+            productEvents.next({
+                eventId: 'event-update',
+                action: 'UPDATED',
+                productId: updated.id,
+                occurredAt: '2026-11-06T14:01:00.000Z',
+                product: updated
+            });
+
+            expect(service.products()).toEqual([updated]);
+        });
+
+        it('should ignore older events and clear selected product on deletion', () => {
+            const product = MOCK_PRODUCTS[0];
+            service.loadById(product.id).pipe(take(1)).subscribe();
+            const request = httpMock.expectOne(
+                `${MOCK_ENVIRONMENT_CONFIG.apiUrl}/products/${product.id}`
+            );
+            request.flush(product);
+
+            productEvents.next({
+                eventId: 'event-new',
+                action: 'UPDATED',
+                productId: product.id,
+                occurredAt: '2026-11-06T14:02:00.000Z',
+                product: { ...product, name: 'Newest product' }
+            });
+            productEvents.next({
+                eventId: 'event-old',
+                action: 'UPDATED',
+                productId: product.id,
+                occurredAt: '2026-11-06T14:01:00.000Z',
+                product: { ...product, name: 'Older product' }
+            });
+            productEvents.next({
+                eventId: 'event-delete',
+                action: 'DELETED',
+                productId: product.id,
+                occurredAt: '2026-11-06T14:03:00.000Z',
+                product: null
+            });
+
+            expect(service.selectedProduct()).toBeNull();
+            expect(service.deletedProductId()).toBe(product.id);
+            expect(service.products().find(item => item.id === product.id)).toBeUndefined();
         });
     });
 });
