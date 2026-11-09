@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { take } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
+import { AuthStore } from '../../store/auth.store';
 import { AppNavRoutes } from '../../../../core/config/constants/navigation.constants';
 import { createLoginForm } from '../../utils/login-form.utils';
 import { ErrorMessageComponent } from '../../../../clib/components/error-message/error-message.component';
@@ -14,7 +14,7 @@ import { ErrorMessageComponent } from '../../../../clib/components/error-message
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginPageComponent {
-    private readonly authService = inject(AuthService);
+    private readonly authStore = inject(AuthStore);
     private readonly router = inject(Router);
     readonly isSubmitting = signal(false);
     readonly errorMessage = signal<string | null>(null);
@@ -41,7 +41,7 @@ export class LoginPageComponent {
 
         const credentials = this.form.getRawValue();
 
-        this.authService
+        this.authStore
             .login(credentials)
             .pipe(take(1))
             .subscribe({

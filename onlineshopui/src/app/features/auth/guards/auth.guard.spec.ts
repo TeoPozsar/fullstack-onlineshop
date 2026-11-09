@@ -2,11 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { Router, UrlTree, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { vi } from 'vitest';
 import { authGuard } from './auth.guard';
-import { AuthService } from '../services/auth.service';
+import { AuthStore } from '../store/auth.store';
 import { AppNavRoutes } from '../../../core/config/constants/navigation.constants';
 
 describe('authGuard', () => {
-    let authServiceMock: {
+    let authStoreMock: {
         isAuthenticated: ReturnType<typeof vi.fn>;
     };
     let routerSpy: {
@@ -14,7 +14,7 @@ describe('authGuard', () => {
     };
 
     beforeEach(() => {
-        authServiceMock = {
+        authStoreMock = {
             isAuthenticated: vi.fn()
         };
 
@@ -24,7 +24,7 @@ describe('authGuard', () => {
 
         TestBed.configureTestingModule({
             providers: [
-                { provide: AuthService, useValue: authServiceMock },
+                { provide: AuthStore, useValue: authStoreMock },
                 { provide: Router, useValue: routerSpy }
             ]
         });
@@ -32,7 +32,7 @@ describe('authGuard', () => {
 
     it('should allow activation when user is authenticated', () => {
         // Prepare
-        authServiceMock.isAuthenticated.mockReturnValue(true);
+        authStoreMock.isAuthenticated.mockReturnValue(true);
 
         // Action
         const result = TestBed.runInInjectionContext(() =>
@@ -41,13 +41,13 @@ describe('authGuard', () => {
 
         // Verify
         expect(result).toBe(true);
-        expect(authServiceMock.isAuthenticated).toHaveBeenCalled();
+        expect(authStoreMock.isAuthenticated).toHaveBeenCalled();
         expect(routerSpy.createUrlTree).not.toHaveBeenCalled();
     });
 
     it('should redirect to login when user is not authenticated', () => {
         // Prepare
-        authServiceMock.isAuthenticated.mockReturnValue(false);
+        authStoreMock.isAuthenticated.mockReturnValue(false);
         const mockUrlTree = {} as UrlTree;
         routerSpy.createUrlTree.mockReturnValue(mockUrlTree);
 
@@ -58,7 +58,7 @@ describe('authGuard', () => {
 
         // Verify
         expect(result).toBe(mockUrlTree);
-        expect(authServiceMock.isAuthenticated).toHaveBeenCalled();
+        expect(authStoreMock.isAuthenticated).toHaveBeenCalled();
         expect(routerSpy.createUrlTree).toHaveBeenCalledWith([
             '/',
             AppNavRoutes.Auth.root,
@@ -68,7 +68,7 @@ describe('authGuard', () => {
 
     it('should not inject router when user is authenticated', () => {
         // Prepare
-        authServiceMock.isAuthenticated.mockReturnValue(true);
+        authStoreMock.isAuthenticated.mockReturnValue(true);
 
         // Action
         const result = TestBed.runInInjectionContext(() =>

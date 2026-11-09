@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { take } from 'rxjs';
-import { AuthService } from '../../../features/auth/services/auth.service';
+import { AuthStore } from '../../../features/auth/store/auth.store';
 import { ThemeService } from '../../services/theme.service';
 import { AppNavRoutes } from '../../../core/config/constants/navigation.constants';
 import { IconComponent } from '../icon/icon.component';
@@ -20,13 +20,12 @@ import { IconComponent } from '../icon/icon.component';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavbarComponent implements OnInit {
-    readonly authService = inject(AuthService);
+    readonly authStore = inject(AuthStore);
     readonly themeService = inject(ThemeService);
 
     readonly showMobileMenu = signal(false);
     readonly userEmail = computed(() => {
-        const user = this.authService.getUser();
-        return user()?.email ?? null;
+        return this.authStore.user()?.email ?? null;
     });
 
     readonly productsRootLink = ['/', AppNavRoutes.Products.root];
@@ -36,7 +35,7 @@ export class NavbarComponent implements OnInit {
     readonly registerLink = ['/', AppNavRoutes.Auth.root, AppNavRoutes.Auth.features.register];
 
     ngOnInit(): void {
-        this.authService.loadProfileIfNeeded().pipe(take(1)).subscribe();
+        this.authStore.loadProfileIfNeeded().pipe(take(1)).subscribe();
     }
 
     toggleTheme(): void {
@@ -52,7 +51,7 @@ export class NavbarComponent implements OnInit {
     }
 
     logout(): void {
-        this.authService.logout();
+        this.authStore.logout();
         this.closeMobileMenu();
     }
 }

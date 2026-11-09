@@ -9,11 +9,11 @@
 
 ## 2. Authentication state
 
-- [ ] 2.1 Implement `AuthStore` with `withState`, explicit token/user/profile/loading/error state, `withComputed` authentication and role derivation, browser-safe `access_token` hydration/persistence, and synchronous token access; verify store tests cover hydration, roles, logout, and storage clearing.
-- [ ] 2.2 Add `rxMethod`-based profile, login, and registration workflows where asynchronous composition is useful; verify tests cover profile success/failure, cached profile reuse, login success/failure, registration behavior, error propagation, and final loading state.
-- [ ] 2.3 Migrate app initialization and `authTokenInterceptor` to `AuthStore`; verify initializer and interceptor tests observe one token source and preserve authorization headers.
-- [ ] 2.4 Migrate `authGuard`, `guestGuard`, `rolesGuard`, `HasRoleDirective`, `NavbarComponent`, login, and registration consumers to `AuthStore`; verify focused auth consumer tests pass with one shared injector instance.
-- [ ] 2.5 Convert `AuthService` to a delegating facade or stateless HTTP boundary, or remove it only if no consumer remains; verify it owns no independent mutable auth signals and the complete auth regression gate passes.
+- [x] 2.1 Implement `AuthStore` with `withState`, explicit token/user/profile/loading/error state, `withComputed` authentication and role derivation, browser-safe `access_token` hydration/persistence, and synchronous token access; verify store tests cover hydration, roles, logout, and storage clearing.
+- [x] 2.2 Add `rxMethod`-based profile, login, and registration workflows where asynchronous composition is useful; verify tests cover profile success/failure, cached profile reuse, login success/failure, registration behavior, error propagation, and final loading state.
+- [x] 2.3 Migrate app initialization and `authTokenInterceptor` to `AuthStore`; verify initializer and interceptor tests observe one token source and preserve authorization headers.
+- [x] 2.4 Migrate `authGuard`, `guestGuard`, `rolesGuard`, `HasRoleDirective`, `NavbarComponent`, login, and registration consumers to `AuthStore`; verify focused auth consumer tests pass with one shared injector instance.
+- [x] 2.5 Convert `AuthService` to a delegating facade or stateless HTTP boundary, or remove it only if no consumer remains; verify it owns no independent mutable auth signals and the complete auth regression gate passes.
 
 ## 3. Product catalogue state
 

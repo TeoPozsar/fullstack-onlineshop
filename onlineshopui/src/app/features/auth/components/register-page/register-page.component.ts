@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { take } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
+import { AuthStore } from '../../store/auth.store';
 import { AppNavRoutes } from '../../../../core/config/constants/navigation.constants';
 import { createRegisterForm } from '../../utils/register-form.utils';
 import { ErrorMessageComponent } from '../../../../clib/components/error-message/error-message.component';
@@ -14,7 +14,7 @@ import { ErrorMessageComponent } from '../../../../clib/components/error-message
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterPageComponent {
-    private readonly authService = inject(AuthService);
+    private readonly authStore = inject(AuthStore);
     readonly isSubmitting = signal(false);
     readonly errorMessage = signal<string | null>(null);
 
@@ -34,7 +34,7 @@ export class RegisterPageComponent {
 
         const payload = this.form.getRawValue();
 
-        this.authService
+        this.authStore
             .register(payload)
             .pipe(take(1))
             .subscribe({
