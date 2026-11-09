@@ -17,7 +17,9 @@ describe('ProductDetailPageComponent', () => {
         selectedProduct: ReturnType<typeof signal>;
         loading: ReturnType<typeof signal>;
         error: ReturnType<typeof signal>;
+        deletedProductId: ReturnType<typeof signal>;
         loadById: ReturnType<typeof vi.fn>;
+        clearDeletedProductMarker: ReturnType<typeof vi.fn>;
     };
     let cartServiceMock: {
         addItem: ReturnType<typeof vi.fn>;
@@ -32,6 +34,7 @@ describe('ProductDetailPageComponent', () => {
     };
     let notificationsServiceMock: {
         notifySuccess: ReturnType<typeof vi.fn>;
+        notifyInfo: ReturnType<typeof vi.fn>;
     };
 
     beforeEach(() => {
@@ -39,7 +42,9 @@ describe('ProductDetailPageComponent', () => {
             selectedProduct: signal(MOCK_PRODUCTS[0]),
             loading: signal(false),
             error: signal(null),
-            loadById: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0]))
+            deletedProductId: signal(null),
+            loadById: vi.fn().mockReturnValue(of(MOCK_PRODUCTS[0])),
+            clearDeletedProductMarker: vi.fn()
         };
 
         cartServiceMock = {
@@ -57,7 +62,8 @@ describe('ProductDetailPageComponent', () => {
         };
 
         notificationsServiceMock = {
-            notifySuccess: vi.fn()
+            notifySuccess: vi.fn(),
+            notifyInfo: vi.fn()
         };
 
         TestBed.configureTestingModule({

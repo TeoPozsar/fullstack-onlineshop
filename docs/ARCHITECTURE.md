@@ -38,7 +38,7 @@ The frontend owns presentation state and the browser-local cart. The backend own
 | `model` | Defines JPA entities, embedded address data, composite keys, and user roles |
 | `security` | Configures stateless security, JWT processing, and user details |
 | `exception` | Maps domain and security failures to JSON HTTP responses |
-| `config` | Configures the OpenAPI definition |
+| `config` | Configures OpenAPI and STOMP/WebSocket messaging |
 
 Controllers delegate to services and map entities to DTOs at the HTTP boundary. Repository access remains in the service layer.
 
@@ -120,6 +120,24 @@ sequenceDiagram
 ```
 
 The development environment targets `http://localhost:3000/api`. The production and default environments use the `${API_URL}` placeholder. The mock environment targets `http://mock-api`; its interceptor responds locally for authentication, products (including suppliers), and orders with a simulated delay, allowing frontend development without the backend.
+
+### Real-time product updates
+
+The backend exposes a STOMP-over-WebSocket endpoint at `/api/ws` (the servlet context path is included) and publishes product events to `/topic/products`. The HTTP handshake is permitted so the browser can establish the socket; the STOMP `CONNECT` frame must carry the existing JWT as a `Bearer` `Authorization` header. The inbound channel interceptor validates that token and requires an authenticated principal before allowing subscriptions.
+
+Successful product create, update, and delete operations publish only after their transactional service method returns successfully. Validation, authorization, not-found, conflict, and persistence failures therefore do not publish events. The event contract is:
+
+```json
+{
+  "eventId": "uuid",
+  "action": "CREATED | UPDATED | DELETED",
+  "productId": "uuid",
+  "occurredAt": "2026-01-01T12:00:00Z",
+  "product": "persisted ProductResponseDto or null for DELETED"
+}
+```
+
+`ProductWebSocketService` derives `ws` or `wss` from the configured API URL, subscribes once for the application lifetime, and reconnects with exponential backoff from one second up to 30 seconds with jitter. `ProductService` remains the single owner of product Signals: it deduplicates event IDs, rejects stale per-product timestamps, applies upserts/removals idempotently, and ignores an HTTP mutation response when a newer event already arrived. The mock environment does not open a WebSocket and continues to use its local HTTP interceptor.
 
 ## Database
 

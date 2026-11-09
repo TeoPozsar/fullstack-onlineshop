@@ -42,7 +42,7 @@ describe('ProductCreatePageComponent', () => {
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
         productServiceMock = {
             categories: signal([...MOCK_CATEGORIES]),
             loading: signal(false),

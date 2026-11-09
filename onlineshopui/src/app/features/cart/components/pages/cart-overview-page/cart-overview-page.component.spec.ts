@@ -51,7 +51,7 @@ describe('CartOverviewPageComponent', () => {
 
     beforeEach(() => {
         // Mock console.error to suppress expected error logs during error handling tests
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
         cartServiceMock = {
             items: signal([...MOCK_CART_ITEMS]),
             totalItems: signal(3),

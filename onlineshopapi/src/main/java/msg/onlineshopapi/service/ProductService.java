@@ -9,6 +9,7 @@ import msg.onlineshopapi.repository.OrderDetailRepository;
 import msg.onlineshopapi.repository.ProductRepository;
 import msg.onlineshopapi.repository.SupplierRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,11 +31,13 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
+    @Transactional
     public Product save(Product product) {
         product.setSupplier(requireSupplier(product));
         return productRepository.save(product);
     }
 
+    @Transactional
     public Product update(UUID id, Product product) {
         Product existing = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
@@ -54,6 +57,7 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with id: " + supplierId));
     }
 
+    @Transactional
     public void deleteById(UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));

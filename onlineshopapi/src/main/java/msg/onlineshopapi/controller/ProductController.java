@@ -8,8 +8,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import msg.onlineshopapi.dto.ProductRequestDto;
 import msg.onlineshopapi.dto.ProductResponseDto;
+import msg.onlineshopapi.dto.ProductEventDto;
 import msg.onlineshopapi.dto.mapper.ProductMapper;
 import msg.onlineshopapi.service.ProductService;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,9 @@ public class ProductController {
 
     private final ProductService productService;
     private final ProductMapper productMapper;
+    private final SimpMessagingTemplate messagingTemplate;
+
+    private static final String PRODUCT_TOPIC = "/topic/products";
 
     @GetMapping
     @Operation(summary = "Get all products", description = "Returns a list of all products.")
@@ -52,7 +57,9 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "Product created successfully")
     @ApiResponse(responseCode = "403", description = "Access denied")
     public ProductResponseDto create(@Valid @RequestBody ProductRequestDto dto) {
-        return productMapper.toDto(productService.save(productMapper.toEntity(dto)));
+        ProductResponseDto response = productMapper.toDto(productService.save(productMapper.toEntity(dto)));
+        messagingTemplate.convertAndSend(PRODUCT_TOPIC, ProductEventDto.created(response));
+        return response;
     }
 
     @PutMapping("/{id}")
@@ -63,7 +70,9 @@ public class ProductController {
     @ApiResponse(responseCode = "404", description = "Product not found")
     public ProductResponseDto update(@Parameter(description = "Product ID") @PathVariable UUID id,
                                      @Valid @RequestBody ProductRequestDto dto) {
-        return productMapper.toDto(productService.update(id, productMapper.toEntity(dto)));
+        ProductResponseDto response = productMapper.toDto(productService.update(id, productMapper.toEntity(dto)));
+        messagingTemplate.convertAndSend(PRODUCT_TOPIC, ProductEventDto.updated(response));
+        return response;
     }
 
     @DeleteMapping("/{id}")
@@ -73,6 +82,7 @@ public class ProductController {
     @ApiResponse(responseCode = "403", description = "Access denied")
     public ResponseEntity<Void> delete(@Parameter(description = "Product ID") @PathVariable UUID id) {
         productService.deleteById(id);
+        messagingTemplate.convertAndSend(PRODUCT_TOPIC, ProductEventDto.deleted(id));
         return ResponseEntity.noContent().build();
     }
 }
